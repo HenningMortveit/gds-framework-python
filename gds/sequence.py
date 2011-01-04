@@ -24,6 +24,14 @@ class Word :
             print "Type: ", type(a)
             raise SequenceError()
 
+    def __hash__(self) :
+        return 0 # A pathethic has function.
+
+    def __eq__(self, other) :
+        if other == None :
+            return False
+
+        return self.w == other.w
 
     def __repr__(self) :
         return str(self.w)

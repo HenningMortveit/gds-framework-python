@@ -30,11 +30,13 @@ def ComputeGroup( permutationGenerators ) :
     n1 = len(genSet)
 
     while n1 > n0 :
+#        print n0, n1
+#        print genSet
         n0 = n1
         ExpandGroup(genSet)
         n1 = len(genSet)
 
-    return genSet
+    return list(genSet)
 
 
 
@@ -53,7 +55,7 @@ def C_n( n ) :
 
     sigma = sequence.Permutation(n)
     for i in range(0,n) :
-        sigma[i] = (i + 1 % n)
+        sigma[i] = (i + 1) % n
 
     return ComputeGroup( [sigma] )
 
@@ -65,7 +67,7 @@ def D_n(n) :
     tau = sequence.Permutation(n)
 
     for i in range(0,n) :
-        sigma[i] = (i + 1 % n)
+        sigma[i] = (i + 1) % n
         tau[i] = n - 1 - i;
 
     return ComputeGroup( [sigma, tau] )

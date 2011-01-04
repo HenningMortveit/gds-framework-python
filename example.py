@@ -129,4 +129,11 @@ for i, eqClass in enumerate(kappaEqClasses) :
 circ = gds.graphs.HyperCube(dim = 3, base = 2)
 print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)
 
-print groups.CreateAutQ2_3()
+
+c4 = gds.groups.C_n( 4 )
+print len(c4), c4
+d4 = gds.groups.D_n( 4 )
+print len(d4), d4
+
+aq23 = gds.groups.CreateAutQ2_3()
+print len(aq23), aq23
