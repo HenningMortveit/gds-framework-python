@@ -11,6 +11,7 @@ import gds.phase_space
 import gds.sequence
 import gds.equivalence
 import gds.orientation
+import gds.groups
 
 import networkx as nx
 from networkx.algorithms import *
@@ -127,3 +128,5 @@ for i, eqClass in enumerate(kappaEqClasses) :
 
 circ = gds.graphs.HyperCube(dim = 3, base = 2)
 print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)
+
+print groups.CreateAutQ2_3()
