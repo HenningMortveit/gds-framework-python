@@ -97,10 +97,11 @@ def OrientationExample() :
 OrientationExample()
 
 
-circ = gds.graphs.CircleGraph(6)
+
 circ = gds.graphs.PathGraph(6)
 circ = gds.graphs.WheelGraph(4)
 circ = gds.graphs.HyperCube(dim = 3, base = 2)
+circ = gds.graphs.CircleGraph(4)
 
 print circ.nodes()
 print circ.edges()
@@ -116,6 +117,13 @@ kle = gds.equivalence.KappaLinearExtensions(circ, 0)
 
 print "alpha(Y) = ", len(le)
 print "kappa(Y) = ", len(kle)
+
+
+kappaEqClasses = gds.equivalence.KappaClasses(circ)
+for i, eqClass in enumerate(kappaEqClasses) :
+    print "Class:", i
+    for p in eqClass :
+        print "\t", p[1]
 
 circ = gds.graphs.HyperCube(dim = 3, base = 2)
 print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)

@@ -25,6 +25,9 @@ class Orientation :
         self.digraph = None
         self.CreateOrientation()
 
+    def __eq__(self, other) :
+        return self.digraph.edges() == other.digraph.edges()
+
     def SetOrientation(o) :
 
         if len( self.graph.nodes() ) != len( o ) :
@@ -66,6 +69,33 @@ class Orientation :
                     self.digraph.add_edge( e[0], e[1] )
                 else :
                     self.digraph.add_edge( e[1], e[0] )
+
+    def ClickConvert(self, v) :
+        """Reverse orientation of all edges incident with 'v'."""
+
+        out_edges = self.digraph.out_edges(v)
+        in_edges = self.digraph.in_edges(v)
+
+        self.digraph.remove_edges_from(out_edges)
+        self.digraph.remove_edges_from(in_edges)
+
+        for e in out_edges :
+            self.digraph.add_edge( e[1], e[0] )
+
+        for e in in_edges :
+            self.digraph.add_edge( e[1], e[0] )
+
+
+    def GetSources(self) :
+        """Return a list of source vertices, if any."""
+
+        sources = []
+        for i in self.digraph.nodes() :
+            if self.digraph.in_degree( i ) == 0 :
+                sources.append(i)
+
+        return sources
+
 
     def IsAcyclic(self) :
         pi = nx.algorithms.topological_sort( self.digraph )

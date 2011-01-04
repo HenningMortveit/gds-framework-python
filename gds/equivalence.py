@@ -7,6 +7,8 @@ import util.enumeration
 import sequence
 import orientation
 import copy
+import networkx
+import sys
 
 def AcyclicOrientations(graph) :
     """Create all acyclic orientations of a graph by checking each
@@ -33,6 +35,40 @@ def AcyclicOrientations(graph) :
         enum.Next()
 
     return (acyclicOrientations, linearExtensions)
+
+
+def KappaClasses(graph) :
+    """Compute the complete set of kappa classes (and not only
+    representatives)."""
+
+    kappaEqClasses = []
+
+    X = networkx.Graph()
+
+    (acyc, linExt) = AcyclicOrientations(graph)
+
+    n = len( acyc )
+    X.add_nodes_from( range(0,n) )
+
+    for i, a in enumerate(acyc) :
+        sources = a.GetSources()
+        for j in sources :
+            a.ClickConvert(j)
+            r = [(k, a2) for k, a2 in enumerate(acyc) if a == a2 and i != k ]
+            a.ClickConvert(j)
+            X.add_edge(i, r[0][0])
+
+    components = networkx.connected_components(X)
+
+    for component in components :
+        eqClass = []
+
+        for k in component :
+            eqClass.append( [acyc[k], linExt[k] ] )
+
+        kappaEqClasses.append( eqClass )
+
+    return kappaEqClasses
 
 
 
@@ -107,7 +143,7 @@ def KappaLinearExtensions(graph, v) :
 
 def ContractEdge(graph, e) :
     """In the graph 'graph' contract the edge e to a vertex. Also
-    return the edgs inserted and the edges deleted. """
+    return the edges inserted and the edges deleted. """
 
     i = e[0]
     j = e[1]
