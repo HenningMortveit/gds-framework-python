@@ -36,6 +36,44 @@ def AcyclicOrientations(graph) :
 
     return (acyclicOrientations, linearExtensions)
 
+def KappaBarClasses(graph, autX, kappaEqClasses = None) :
+    """Compute the kappa-bar classes of a graph. The argument 'group'
+    should be the automorphism group of the 'graph'. One may re-use
+    kappaEqClasses from earlier computations."""
+
+    barClasses = []
+
+    if kappaEqClasses == None :
+        kappaEqClasses = KappaClasses(graph)
+
+    cycleBasis = networkx.cycle_basis(graph, 0)
+
+    kappa = len(kappaEqClasses)
+
+    nu = []
+
+    for eqClass in kappaEqClasses :
+        nu.append( orientation.NuFunctionCB(eqClass[0][0], cycleBasis) )
+
+    X = networkx.Graph()
+
+    for i, eqClass in enumerate(kappaEqClasses) :
+        O = eqClass[0][0]
+        for gamma in autX :
+            oPrime = orientation.AutXActionAcycX(gamma, O)
+            nuPrime = orientation.NuFunctionCB(oPrime, cycleBasis)
+            index = [ j for j, nu_j in enumerate(nu) if nu_j == nuPrime]
+            if len(index) > 0 :
+                X.add_edge(i, index[0])
+
+    components = networkx.connected_components(X)
+
+    for component in components :
+        index = component[0]
+        barClasses.append( kappaEqClasses[index][0] )
+
+    return barClasses
+
 
 def KappaClasses(graph) :
     """Compute the complete set of kappa classes (and not only

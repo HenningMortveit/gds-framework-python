@@ -18,7 +18,7 @@ from networkx.algorithms import *
 
 import copy
 import sys
-
+import cProfile
 
 
 def SDSExample() :
@@ -59,8 +59,6 @@ def SDSExample() :
 
 
 
-transitions = SDSExample()
-
 
 def NetworkXExample(transitions) :
     """Example of how phase space can be manipulated by network x"""
@@ -78,7 +76,6 @@ def NetworkXExample(transitions) :
     return d
 
 
-NetworkXExample(transitions)
 
 #import itertools
 
@@ -95,45 +92,64 @@ def OrientationExample() :
     print "Orientation:", aO
     print "Linear extension: ", aO.LinearExtension()
 
-OrientationExample()
 
+def main() :
 
+    transitions = SDSExample()
+    NetworkXExample(transitions)
+    OrientationExample()
 
-circ = gds.graphs.PathGraph(6)
-circ = gds.graphs.WheelGraph(4)
-circ = gds.graphs.HyperCube(dim = 3, base = 2)
-circ = gds.graphs.CircleGraph(4)
+    circ = gds.graphs.PathGraph(6)
+    circ = gds.graphs.WheelGraph(4)
+    q23 = gds.graphs.HyperCube(dim = 3, base = 2)
+    circ = gds.graphs.CircleGraph(4)
 
-print circ.nodes()
-print circ.edges()
+    print circ.nodes()
+    print circ.edges()
 
-print "Linear extensions"
-le = gds.equivalence.LinearExtensions( circ )
+    print "Linear extensions"
+    le = gds.equivalence.LinearExtensions( circ )
 #print le
 
-print "Kappa linear extensions"
-kle = gds.equivalence.KappaLinearExtensions(circ, 0)
+    print "Kappa linear extensions"
+    kle = gds.equivalence.KappaLinearExtensions(circ, 0)
 
 #print kle
 
-print "alpha(Y) = ", len(le)
-print "kappa(Y) = ", len(kle)
+    print "alpha(Y) = ", len(le)
+    print "kappa(Y) = ", len(kle)
 
 
-kappaEqClasses = gds.equivalence.KappaClasses(circ)
-for i, eqClass in enumerate(kappaEqClasses) :
-    print "Class:", i
-    for p in eqClass :
-        print "\t", p[1]
+    kappaEqClasses = gds.equivalence.KappaClasses(circ)
+    for i, eqClass in enumerate(kappaEqClasses) :
+        print "Class:", i
+        for p in eqClass :
+            print "\t", p[1]
 
-circ = gds.graphs.HyperCube(dim = 3, base = 2)
-print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)
+    circ = gds.graphs.HyperCube(dim = 3, base = 2)
+    print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)
 
 
-c4 = gds.groups.C_n( 4 )
-print len(c4), c4
-d4 = gds.groups.D_n( 4 )
-print len(d4), d4
+    c4 = gds.groups.C_n( 4 )
+    print len(c4), c4
+    d4 = gds.groups.D_n( 4 )
+    print len(d4), d4
 
-aq23 = gds.groups.CreateAutQ2_3()
-print len(aq23), aq23
+    autq23 = gds.groups.CreateAutQ2_3()
+    print len(autq23)
+
+
+    circ = gds.graphs.CircleGraph(4)
+
+    print circ.edges()
+    print networkx.cycle_basis(circ, 0)
+
+    print gds.equivalence.KappaBarClasses(circ, d4)
+    print gds.equivalence.KappaBarClasses(q23, autq23)
+
+# ------------------------------------------------------------
+
+
+main()
+
+#cProfile.run('main()', 'profile.txt')

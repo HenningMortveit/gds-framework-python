@@ -5,8 +5,58 @@
 
 import sequence
 
+import copy
+
 import networkx as nx
 import networkx.algorithms
+
+
+def NuFunction(orientation, cycle) :
+    """Compute the value of the nu-function for the given orientation
+    and the given cycle. It is assumed that cycle is valid."""
+
+    nu = 0;
+    n = len(cycle)
+
+    for i in range(0, n):
+        e = [cycle[i], cycle[(i+1) % n]]
+        if e == orientation( e ) :
+            nu += 1
+        else :
+            nu -= 1
+
+    return nu
+
+
+def NuFunctionCB(orientation, cycleBasis) :
+    """Compute the value of the nu-function for the given orientation
+    on the given cycle basis. It is assumed that cycle basis is
+    valid."""
+
+    nu = []
+    for cycle in cycleBasis :
+        nu.append( NuFunction(orientation, cycle) )
+
+    return nu
+
+def AutXActionAcycX(gamma, O) :
+    """Return gamma dot O. Here gamma is an automorphism of the graph
+    of O."""
+
+    gammaInv = ~gamma
+    digraph = networkx.DiGraph()
+
+    orientation = copy.copy(O)
+
+    for e in O.graph.edges() :
+        gamma_e = [ gammaInv[e[0]], gammaInv[e[1]] ]
+        O_gamma_e = O( gamma_e )
+        edge = [ gamma[O_gamma_e[0]], gamma[O_gamma_e[1]] ]
+        digraph.add_edge( edge[0], edge[1] )
+
+    orientation.digraph = digraph
+    return orientation
+
 
 class Orientation :
 
@@ -108,11 +158,11 @@ class Orientation :
         if not self.graph.has_edge( edge[0], edge[1] ) :
             print "Edge not present in graph"
             raise Exception()
+
         if self.digraph.has_edge( edge[0], edge[1] ) :
             return [edge[0], edge[1]]
         else :
             return [edge[1], edge[0]]
-        pass
 
     def LinearExtension(self) :
         return nx.algorithms.topological_sort( self.digraph )
