@@ -23,7 +23,8 @@ def AcyclicOrientations(graph) :
 
     for i in range(0, N) :
         o = enum.Current()
-        O = orientation.Orientation(graph, orientation = o)
+        O = orientation.Orientation(graph = graph, orientation = o)
+
         try :
             le = O.LinearExtension()
             if le != None :
@@ -86,15 +87,33 @@ def KappaClasses(graph) :
     (acyc, linExt) = AcyclicOrientations(graph)
 
     n = len( acyc )
+
     X.add_nodes_from( range(0,n) )
 
-    for i, a in enumerate(acyc) :
-        sources = a.GetSources()
+    for i in range(0, n) :
+        sources = acyc[i].GetSources()
         for j in sources :
-            a.ClickConvert(j)
-            r = [(k, a2) for k, a2 in enumerate(acyc) if a == a2 and i != k ]
-            a.ClickConvert(j)
-            X.add_edge(i, r[0][0])
+            acyc[i].ClickConvert(j)
+            r = -1
+            for k in range(0,n) :
+                if k != i and acyc[i] == acyc[k] :
+                    r = k;
+                    break
+            #r = [(k, a2) for k, a2 in enumerate(acyc) if a == a2 and i != k ]
+            acyc[i].ClickConvert(j)
+            #if len(r) == 0 :
+            if r == -1 :
+                print "What?? r = ", r
+                print "source vertex: ", j
+                print "sources:", sources
+                print acyc[i].rep
+                acyc[i].ClickConvert(j)
+                print acyc[i].rep
+                acyc[i].ClickConvert(j)
+                print acyc[i].rep
+                raise Exception()
+#            X.add_edge(i, r[0][0])
+            X.add_edge(i, r)
 
     components = networkx.connected_components(X)
 
@@ -125,7 +144,8 @@ def LinearExtensions(graph) :
 
     for i in range(0, N) :
         o = enum.Current()
-        O = orientation.Orientation(graph, orientation = o)
+        O = orientation.Orientation(graph = graph, orientation = o)
+
         try :
             le = O.LinearExtension()
             if le != None :

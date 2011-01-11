@@ -85,11 +85,10 @@ def NetworkXExample(transitions) :
 def OrientationExample() :
     circ =  gds.graphs.CircleGraph(4)
     pi = gds.sequence.Permutation([0,1,2,3])
-    aO = gds.orientation.Orientation(circ, pi = pi)
+    aO = gds.orientation.Orientation(graph = circ, permutation = pi)
 
     print "Orientation", "{3,2}", aO( (3,2) )
-
-    print "Orientation:", aO
+    print "Orientation", "{2,3}", aO( (2,3) )
     print "Linear extension: ", aO.LinearExtension()
 
 
@@ -104,48 +103,65 @@ def main() :
     q23 = gds.graphs.HyperCube(dim = 3, base = 2)
     circ = gds.graphs.CircleGraph(4)
 
-    print circ.nodes()
-    print circ.edges()
-
-    print "Linear extensions"
-    le = gds.equivalence.LinearExtensions( circ )
-#print le
-
-    print "Kappa linear extensions"
-    kle = gds.equivalence.KappaLinearExtensions(circ, 0)
-
-#print kle
-
-    print "alpha(Y) = ", len(le)
-    print "kappa(Y) = ", len(kle)
+    print "Circle:"
+    print "\tVertices:", circ.nodes()
+    print "\tEdges:", circ.edges()
 
 
-    kappaEqClasses = gds.equivalence.KappaClasses(circ)
-    for i, eqClass in enumerate(kappaEqClasses) :
-        print "Class:", i
-        for p in eqClass :
-            print "\t", p[1]
+    # Circle case
 
-    circ = gds.graphs.HyperCube(dim = 3, base = 2)
-    print "alpha(Y) = ", gds.equivalence.EnumAcyclicOrientations(circ)
+    n = 4
 
+    c = gds.graphs.CircleGraph(n)
+    d = gds.groups.D_n(n)
 
-    c4 = gds.groups.C_n( 4 )
-    print len(c4), c4
-    d4 = gds.groups.D_n( 4 )
-    print len(d4), d4
+    print "circle graph:", n
+    print "Linear extensions:"
+    le = gds.equivalence.LinearExtensions( c )
+    for e in le :
+        print "\t", e
 
+    print "Kappa representatives - linear extensions:"
+    kle = gds.equivalence.KappaLinearExtensions(c, 0)
+    for e in kle :
+        print "\t", e
+
+    print "Kappa bar representatives - linear extensions:"
+    kble = gds.equivalence.KappaBarClasses(c, d)
+    for e in kble :
+        print "\t", e[1]
+
+    print "Circle", n
+    print "\talpha(Y) = ", len(le)
+    print "\tkappa(Y) = ", len(kle)
+    print "\tkappabar(Y) = ", len(kble)
+    print ""
+
+    # 3-cube
+
+    q23 = gds.graphs.HyperCube(dim = 3, base = 2)
     autq23 = gds.groups.CreateAutQ2_3()
-    print len(autq23)
 
+    le = gds.equivalence.LinearExtensions( q23 )
+    for e in le :
+        print "\t", e
 
-    circ = gds.graphs.CircleGraph(4)
+    print "Kappa representatives - linear extensions:"
+    kle = gds.equivalence.KappaLinearExtensions(q23, 0)
+    for e in kle :
+        print "\t", e
 
-    print circ.edges()
-    print networkx.cycle_basis(circ, 0)
+    print "Kappa bar representatives - linear extensions:"
+    kble = gds.equivalence.KappaBarClasses(q23, autq23)
+    for e in kble :
+        print "\t", e[1]
 
-    print gds.equivalence.KappaBarClasses(circ, d4)
-    print gds.equivalence.KappaBarClasses(q23, autq23)
+    print "3-cube", n
+    print "\talpha(Y) = ", len(le)
+    print "\tkappa(Y) = ", len(kle)
+    print "\tkappabar(Y) = ", len(kble)
+    print ""
+
 
 # ------------------------------------------------------------
 
