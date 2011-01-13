@@ -37,96 +37,6 @@ def AcyclicOrientations(graph) :
 
     return (acyclicOrientations, linearExtensions)
 
-def KappaBarClasses(graph, autX, kappaEqClasses = None) :
-    """Compute the kappa-bar classes of a graph. The argument 'group'
-    should be the automorphism group of the 'graph'. One may re-use
-    kappaEqClasses from earlier computations."""
-
-    barClasses = []
-
-    if kappaEqClasses == None :
-        kappaEqClasses = KappaClasses(graph)
-
-    cycleBasis = networkx.cycle_basis(graph, 0)
-
-    kappa = len(kappaEqClasses)
-
-    nu = []
-
-    for eqClass in kappaEqClasses :
-        nu.append( orientation.NuFunctionCB(eqClass[0][0], cycleBasis) )
-
-    X = networkx.Graph()
-
-    for i, eqClass in enumerate(kappaEqClasses) :
-        O = eqClass[0][0]
-        for gamma in autX :
-            oPrime = orientation.AutXActionAcycX(gamma, O)
-            nuPrime = orientation.NuFunctionCB(oPrime, cycleBasis)
-            index = [ j for j, nu_j in enumerate(nu) if nu_j == nuPrime]
-            if len(index) > 0 :
-                X.add_edge(i, index[0])
-
-    components = networkx.connected_components(X)
-
-    for component in components :
-        index = component[0]
-        barClasses.append( kappaEqClasses[index][0] )
-
-    return barClasses
-
-
-def KappaClasses(graph) :
-    """Compute the complete set of kappa classes (and not only
-    representatives)."""
-
-    kappaEqClasses = []
-
-    X = networkx.Graph()
-
-    (acyc, linExt) = AcyclicOrientations(graph)
-
-    n = len( acyc )
-
-    X.add_nodes_from( range(0,n) )
-
-    for i in range(0, n) :
-        sources = acyc[i].GetSources()
-        for j in sources :
-            acyc[i].ClickConvert(j)
-            r = -1
-            for k in range(0,n) :
-                if k != i and acyc[i] == acyc[k] :
-                    r = k;
-                    break
-            #r = [(k, a2) for k, a2 in enumerate(acyc) if a == a2 and i != k ]
-            acyc[i].ClickConvert(j)
-            #if len(r) == 0 :
-            if r == -1 :
-                print "What?? r = ", r
-                print "source vertex: ", j
-                print "sources:", sources
-                print acyc[i].rep
-                acyc[i].ClickConvert(j)
-                print acyc[i].rep
-                acyc[i].ClickConvert(j)
-                print acyc[i].rep
-                raise Exception()
-#            X.add_edge(i, r[0][0])
-            X.add_edge(i, r)
-
-    components = networkx.connected_components(X)
-
-    for component in components :
-        eqClass = []
-
-        for k in component :
-            eqClass.append( [acyc[k], linExt[k] ] )
-
-        kappaEqClasses.append( eqClass )
-
-    return kappaEqClasses
-
 
 
 def LinearExtensions(graph) :
@@ -199,6 +109,101 @@ def KappaLinearExtensions(graph, v) :
 
 
 
+def KappaClasses(graph) :
+    """Compute the complete set of kappa classes (and not only
+    representatives). Returns matching pairs of acyclic orientation
+    and linear extensions."""
+
+    kappaEqClasses = []
+
+    X = networkx.Graph()
+
+    (acyc, linExt) = AcyclicOrientations(graph)
+
+    n = len( acyc )
+
+    X.add_nodes_from( range(0,n) )
+
+    for i in range(0, n) :
+        sources = acyc[i].GetSources()
+        for j in sources :
+            acyc[i].ClickConvert(j)
+            r = -1
+            for k in range(0,n) :
+                if k != i and acyc[i] == acyc[k] :
+                    r = k;
+                    break
+            #r = [(k, a2) for k, a2 in enumerate(acyc) if a == a2 and i != k ]
+            acyc[i].ClickConvert(j)
+            #if len(r) == 0 :
+            if r == -1 :
+                print "What?? r = ", r
+                print "source vertex: ", j
+                print "sources:", sources
+                print acyc[i].rep
+                acyc[i].ClickConvert(j)
+                print acyc[i].rep
+                acyc[i].ClickConvert(j)
+                print acyc[i].rep
+                raise Exception()
+#            X.add_edge(i, r[0][0])
+            X.add_edge(i, r)
+
+    components = networkx.connected_components(X)
+
+    for component in components :
+        eqClass = []
+
+        for k in component :
+            eqClass.append( [acyc[k], linExt[k] ] )
+
+        kappaEqClasses.append( eqClass )
+
+    return kappaEqClasses
+
+
+
+
+def KappaBarClasses(graph, autX, kappaEqClasses = None) :
+    """Compute the kappa-bar classes of a graph. The argument 'group'
+    should be the automorphism group of the 'graph'. One may re-use
+    kappaEqClasses from earlier computations."""
+
+    barClasses = []
+
+    if kappaEqClasses == None :
+        kappaEqClasses = KappaClasses(graph)
+
+    cycleBasis = networkx.cycle_basis(graph, 0)
+
+    kappa = len(kappaEqClasses)
+
+    nu = []
+
+    for eqClass in kappaEqClasses :
+        nu.append( orientation.NuFunctionCB(eqClass[0][0], cycleBasis) )
+
+    X = networkx.Graph()
+
+    for i, eqClass in enumerate(kappaEqClasses) :
+        O = eqClass[0][0]
+        for gamma in autX :
+            oPrime = orientation.AutXActionAcycX(gamma, O)
+            nuPrime = orientation.NuFunctionCB(oPrime, cycleBasis)
+            index = [ j for j, nu_j in enumerate(nu) if nu_j == nuPrime]
+            if len(index) > 0 :
+                X.add_edge(i, index[0])
+
+    components = networkx.connected_components(X)
+
+    for component in components :
+        index = component[0]
+        barClasses.append( kappaEqClasses[index][0] )
+
+    return barClasses
+
+# Enumeration
+
 def ContractEdge(graph, e) :
     """In the graph 'graph' contract the edge e to a vertex. Also
     return the edges inserted and the edges deleted. """
@@ -254,3 +259,8 @@ def EnumAcyclicOrientations(graph) :
     graph.add_edge(e[0], e[1])
 
     return k1 + k2
+
+def EnumKappaClasses(graph) :
+    """ """
+
+    pass

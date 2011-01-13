@@ -1,4 +1,5 @@
 
+import pygraphviz as pgv
 
 import gds.util.enumeration
 import gds.state
@@ -162,7 +163,8 @@ def main() :
     print "\tkappabar(Y) = ", len(kble)
     print ""
 
-
+    #networkx.draw(q23)
+    networkx.draw_graphviz(q23)
 # ------------------------------------------------------------
 
 
