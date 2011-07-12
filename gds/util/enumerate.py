@@ -3,7 +3,8 @@
 class TupleConverter :
     """A class for converting n-tuples of the form (a_1, ..., a_n)
     where 0 <= a_i < m_i to integers and vice versa. The list 'limit'
-    contains the m_i's."""
+    in the constructor contains the m_i's. This is the "mixed radix"
+    notation. """
 
     def __init__(self, limit) :
         self.limit = limit    # the list of the m_i's

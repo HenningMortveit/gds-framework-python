@@ -18,6 +18,19 @@ def parity(s, indexList, i) :
         sum += s[k].x
     return state.State(sum % 2, 2)
 
+def majority(s, indexList, i) :
+    """Boolean parity function (sum modulo 2)"""
+
+    sum = 0
+    for k in indexList :
+        sum += s[k].x
+
+    if sum >= 0.5*len(indexList) :
+        return state.State(1, 2)
+    else :
+        return state.State(0, 2)
+
+
 def nor(s, indexList, i) :
     """Boolean nor function"""
 
@@ -29,12 +42,24 @@ def nor(s, indexList, i) :
 def nand(s, indexList, i) :
     """Boolean nand function"""
 
+    sum = 0
+    l = len(indexList)
     for k in indexList :
-        if s[k].x == 0 :
-            return state.State(1, 2)
-        else :
-            return state.State(0, 2)
+        sum += s[k].x
+    return state.State(0 if sum == l else 1, 2)
 
+
+class threshold :
+    """Binary threshold rule."""
+
+    def __init__(self, k ) :
+        self.k = k
+
+    def __call__(self, s, indexList, i) :
+        sum = 0
+        for j in indexList :
+            sum += s[j].x
+        return state.State( 0 if sum < self.k else 1, 2)
 
 class threshold :
     """Binary threshold rule."""

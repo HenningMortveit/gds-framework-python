@@ -202,6 +202,33 @@ def KappaBarClasses(graph, autX, kappaEqClasses = None) :
 
     return barClasses
 
+def AlphaBarClasses(graph, autX) :
+    """Compute the alpha-bar classes of a graph. The argument 'group'
+    should be the automorphism group of the 'graph'."""
+
+    acyc = AcyclicOrientations(graph)[0]
+
+    X = networkx.Graph()
+
+    for i, a in enumerate(acyc) :
+        for gamma in autX :
+            aPrime = orientation.AutXActionAcycX(gamma, a)
+            for j, ac in enumerate(acyc) :
+                if ac == aPrime :
+                    X.add_edge(i, j)
+                    break
+
+    components = networkx.connected_components(X)
+
+    barClasses = []
+
+    for component in components :
+        index = component[0]
+        barClasses.append( acyc[index] )
+
+    return barClasses
+
+
 # Enumeration
 
 def ContractEdge(graph, e) :
@@ -261,6 +288,65 @@ def EnumAcyclicOrientations(graph) :
     return k1 + k2
 
 def EnumKappaClasses(graph) :
-    """ """
+    """Compute the number of kappa classes of the graph 'graph' using
+    the deletion contraction recursion with cycle edges."""
 
-    pass
+    m = len( graph.edges() )
+
+    if m == 0 or m == 1 or m == 2:
+        return 1
+
+    cycle_basis = networkx.cycle_basis(graph)
+    if len( cycle_basis ) == 0 :
+        return 1
+
+    edge = [ cycle_basis[0][0], cycle_basis[0][1] ]
+
+    (j, deleteEdgeList, insertEdgeList) = ContractEdge(graph, edge)
+    k1 = EnumKappaClasses(graph)
+    RestoreContractedEdge(graph, j, deleteEdgeList, insertEdgeList)
+
+    graph.remove_edge(edge[0], edge[1])
+    k2 = EnumKappaClasses(graph)
+    graph.add_edge(edge[0], edge[1])
+
+    return k1 + k2
+
+
+def EnumAlphaBarClasses(graph, autX) :
+    """Compute the number of alpha-bar classes of a graph. The
+    argument 'group' should be the automorphism group of the
+    'graph'. This is the basic version using Burnside's lemma without
+    reference to orbit graphs."""
+
+    acyc = AcyclicOrientations(graph)[0]
+
+    X = networkx.Graph()
+
+    sum = 0
+
+    for gamma in autX :
+
+        for a in acyc :
+            aPrime = orientation.AutXActionAcycX(gamma, a)
+            if a == aPrime :
+                sum += 1
+
+    return sum / len(autX)
+
+
+if __name__ == '__main__' :
+
+    import graphs
+    import groups
+
+    q23 = graphs.HyperCube(dim = 3, base = 2)
+    autq23 = groups.CreateAutQ2_3()
+
+    kappa = EnumKappaClasses(q23)
+    print "kappa(q23) =", kappa
+    alpha = EnumAcyclicOrientations(q23)
+    print "alpha(q23) =", alpha
+#    alphaBar = len( AlphaBarClasses(q23, autq23) )
+    alphaBar = EnumAlphaBarClasses(q23, autq23)
+    print "alphaBar(q23) =", alphaBar
