@@ -107,7 +107,7 @@ def SDSBlockSequenceExample() :
 
     n = 5
 
-    pi0 = [[0,2], [1], [3], [4]]
+    pi0 = [[0,3], [4], [1], [2]]
 
     X = gds.graphs.CircleGraph(n)
     f = n * [gds.functions.nor]
