@@ -18,6 +18,7 @@ class GDS :
         self.SetGraph(g, stateObjectList, circleFlag)
         self.SetMap(f)
         self.sequence = None
+        self.blockSequence = None
 
 
     def SetGraph(self, g, stateObjectList, circleFlag = False) :
@@ -50,17 +51,44 @@ class GDS :
         if not s.issubset(n) :
             print "Replace by an exception"
         self.sequence = sequence
+        self.blockSequence = None
+
+    def SetBlockSequence(self, blockSequence) :
+        s = set()
+        for b in blockSequence :
+            for i in b :
+                s.add(i)
+        n = set( self.g.nodes() )
+        if not s.issubset(n) :
+            print "Replace by an exception"
+        self.blockSequence = blockSequence
+        self.sequence = None;
 
     def SetParallel(self) :
         self.sequence = None
+        self.blockSequence = None
 
     def Evaluate(self, x) :
         """Evaluate the GDS map at x and return the image."""
-        if self.sequence == None :
-            return self.EvaluateParallel(x)
-        else :
+        if self.sequence != None :
             y = copy.deepcopy(x)
             return self.EvaluateSequential(y)
+        elif self.blockSequence != None :
+            y = copy.deepcopy(x)
+            return self.EvaluateBlockSequential(y)
+        else :
+            return self.EvaluateParallel(x)
+
+    def EvaluateBlockSequential(self, x) :
+        for block in self.blockSequence :
+            if( len(block) > 1 ) :
+                y = copy.deepcopy(x)
+                for i in block :
+                    x[i] = self.f[i](y, self.iMap[i], i)
+            else :
+                i = block[0]
+                x[i] = self.f[i](x, self.iMap[i], i)
+        return x
 
     def EvaluateParallel(self, x) :
         y = []

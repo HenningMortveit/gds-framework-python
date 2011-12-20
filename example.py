@@ -101,6 +101,51 @@ def SDSExample() :
     return transitions
 
 
+
+def SDSBlockSequenceExample() :
+    """Basic example for phase space on X = Circle_4."""
+
+    n = 5
+
+    pi0 = [[0,1], [2], [4], [3]]
+
+    X = gds.graphs.CircleGraph(n)
+    f = n * [gds.functions.nor]
+
+    stateObject = n * [gds.state.State(0, 2)]
+
+    doCircle = True
+    gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
+    gds1.SetBlockSequence(pi0)
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: "
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
+    return transitions
+
+
+
 def SDSExample3() :
     """Basic example for phase space on X = Circle_4."""
 
@@ -109,7 +154,7 @@ def SDSExample3() :
     pi1 = [0,1,2]
 
     #X = gds.graphs.CircleGraph(n)
- 
+
 
     X = networkx.Graph()
     X.add_edge( 0, 1);
@@ -260,6 +305,9 @@ def FinalExam() :
 
 
 def main() :
+
+    SDSBlockSequenceExample()
+    sys.exit(0)
 
     FinalExam();
     sys.exit(0);
