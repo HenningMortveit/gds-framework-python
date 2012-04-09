@@ -61,20 +61,28 @@ class threshold :
             sum += s[j].x
         return state.State( 0 if sum < self.k else 1, 2)
 
-class threshold :
-    """Binary threshold rule."""
+class biThreshold :
+    """Binary bi-threshold rule."""
 
-    def __init__(self, k ) :
-        self.k = k
+    def __init__(self, kup, kdown ) :
+        self.kup = kup
+        self.kdown = kdown
 
     def __call__(self, s, indexList, i) :
         sum = 0
         for j in indexList :
             sum += s[j].x
-        return state.State( 0 if sum < self.k else 1, 2)
+
+        if s[i].x == 0 and sum >= self.kup :
+            return state.State(1, 2)
+        elif s[i].x == 1 and sum < self.kdown :
+            return state.State(0, 2)
+        else :
+            return s[i]
+
 
 class inverseThreshold :
-    """Binary threshold rule."""
+    """Inverse binary threshold rule."""
 
     def __init__(self, k ) :
         self.k = k

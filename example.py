@@ -17,10 +17,25 @@ import gds.sequence
 
 import networkx as nx
 from networkx.algorithms import *
+import matplotlib.pyplot as plt
 
 import copy
 import sys
 import cProfile
+
+def PlotExample() :
+    X = networkx.Graph()
+    X.add_edge( 0, 1);
+    X.add_edge( 0, 2);
+    X.add_edge( 1, 2);
+
+    pos = dict();
+    pos[0] = [0,0]
+    pos[1] = [1,0]
+    pos[2] = [1,1]
+
+    networkx.drawing.nx_pylab.draw_networkx(X, pos=pos)
+    plt.show()
 
 def MakePNASNetwork() :
     X = networkx.Graph()
@@ -41,6 +56,81 @@ def MakePNASNetwork() :
     return X
 
 
+def BiThresholdExample() :
+
+    n = 4
+    pi = [0,1,2,3];
+    X = gds.graphs.CircleGraph(n)
+    doCircle = True
+#    X = gds.graphs.WheelGraph(n-1)
+#    X = gds.graphs.HyperCube(dim = 3, base = 2)
+    f = n * [gds.functions.biThreshold(1,3)]
+#    one  = gds.state.State(1, 2)
+#    zero = gds.state.State(0, 2)
+
+#     s = [one,zero,zero]
+#     i = [0,1,2]
+#     print f[0](s,i,1)
+#     sys.exit(0)
+
+    stateObject = n * [gds.state.State(0, 2)]
+
+
+    gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
+    gds1.SetSequence(pi)
+#    gds1.SetParallel()
+
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: "
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
+    return transitions
+
+def DynThresholdExample() :
+
+    n = 5
+
+    X = gds.graphs.StarGraph(n)
+    stateObject = (n+1) * [gds.state.StateDynT(0, 1, 1)]
+    stateObject[0] = gds.state.StateDynT(0,1, n)
+
+    f = (n+1) * [gds.functions.f_up_down]
+
+    gds1 = gds.gds.GDS(X, f, stateObject, False)
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: %i" % len(fixedPoints)
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
 
 def SDSExample() :
     """Basic example for phase space on X = Circle_4."""
@@ -305,6 +395,15 @@ def FinalExam() :
 
 
 def main() :
+
+
+    DynThresholdExample()
+    sys.exit(0)
+
+    BiThresholdExample()
+    sys.exit(0)
+
+
 
     SDSBlockSequenceExample()
     sys.exit(0)
