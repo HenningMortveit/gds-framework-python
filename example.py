@@ -433,6 +433,10 @@ def DerridaDiagram() :
     phaseSpace = gds.phase_space.PhaseSpace(gds1);
     F = phaseSpace.GetTransitions()
 
+    diagram = []
+    for i in range(0, n) :
+        diagram.append( (n+1)*[0] )
+
     n = gds1.GetDim();
     stateObjectList = gds1.stateObjectList
     limit = gds1.tupleConverter.limit
@@ -463,13 +467,14 @@ def DerridaDiagram() :
             hd = HammingDistance(x,y)
             image_y = ng.IndexToTuple( F[j] )
             hd2 = HammingDistance(image_x, image_y)
-            print x, y, hd, hd2
+            diagram[hd][hd2] += 1
+            #print x, y, hd, hd2
 
-
+    return diagram
 
 def main() :
 
-    DerridaDiagram()
+    print DerridaDiagram()
     sys.exit(0);
 
 
