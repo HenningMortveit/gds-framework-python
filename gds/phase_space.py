@@ -33,13 +33,15 @@ class PhaseSpace :
 
     def GenerateDigraph(self) :
         if self.transitions == None :
-            self.GenerateTransitions(gds)
+            self.GenerateTransitions()
 
         self.graph = nx.DiGraph()
         for i, j in enumerate( self.transitions ) :
             self.graph.add_edge(i, j)
 
     def GetTransitions(self) :
+        if self.transitions == None :
+            self.GenerateTransitions()
         return self.transitions
 
     def GetDigraph(self) :

@@ -58,6 +58,12 @@ class State :
     def IndexToState(self, i) :
         return State(i, self.size)
 
+    def __eq__(self, other) :
+        return self.x == other.x
+
+    def __ne__(self, other) :
+        return self.x != other.x
+
 
 class StateDynT :
     """State for dynamic threshold GDS. x in {0,1} and k in {1, 2,
@@ -82,3 +88,9 @@ class StateDynT :
         x = i / (self.degree+1)
         k = (i % (self.degree + 1))+ 1
         return StateDynT(x, k, self.degree)
+
+    def __eq__(self, other) :
+        return self.x == other.x and self.k == other.k
+
+    def __ne__(self, other) :
+        return self.x != other.x or self.k != other.k

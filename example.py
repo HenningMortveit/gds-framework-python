@@ -394,7 +394,84 @@ def FinalExam() :
     print "\talphabar(X) = ", k
 
 
+def PhaseSpace() :
+    """Basic example for phase space on X = Circle_4."""
+
+    n = 4
+    circ = gds.graphs.CircleGraph(n)
+    f = n * [gds.functions.majority]
+    stateObject = n * [gds.state.State(0, 2)]
+
+    gds1 = gds.gds.GDS(circ, f, stateObject, True)
+
+    phaseSpace = gds.phase_space.PhaseSpace(gds1);
+    components = phaseSpace.GetComponents()
+    print components
+    fixedPoints = phaseSpace.GetFixedPoints();
+    print fixedPoints
+    periodicPoints = phaseSpace.GetPeriodicPoints()
+    print periodicPoints
+
+def NotEqual(a,b) : 
+    return a!=b
+
+def HammingDistance(x,y) :
+    assert len(x) == len(y)
+    return sum( map(NotEqual, x, y) )
+
+def HammingNorm(x) :
+    return HammingDistance(x, len(x)*[0] )
+
+def DerridaDiagram() :
+
+    n = 4
+    circ = gds.graphs.CircleGraph(n)
+    f = n * [gds.functions.majority]
+    stateObject = n * [gds.state.State(0, 2)]
+    gds1 = gds.gds.GDS(circ, f, stateObject, True)
+
+    phaseSpace = gds.phase_space.PhaseSpace(gds1);
+    F = phaseSpace.GetTransitions()
+
+    n = gds1.GetDim();
+    stateObjectList = gds1.stateObjectList
+    limit = gds1.tupleConverter.limit
+    ng = gds.util.enumeration.NTupleGenerator(limit)
+    nStates = ng.Num()
+
+    x = n*[0]
+    y = n*[0]
+    image_x = n*[0]
+    image_y = n*[0]
+
+    for i in xrange(0, nStates) :
+        config = ng.Current()
+
+        # Convert from index space to state space:
+        for j in range(0,n) :
+            x[j] = stateObjectList[j].IndexToState( config[j] )
+        image_x =  ng.IndexToTuple( F[i] ) 
+
+        ng2 = copy.deepcopy(ng)
+
+        for j in xrange(i+1, nStates) :
+            ng2.Next()
+            config = ng2.Current()
+            for j in range(0,n) :
+                y[j] = stateObjectList[j].IndexToState( config[j] )
+
+            hd = HammingDistance(x,y)
+            image_y = ng.IndexToTuple( F[j] )
+            hd2 = HammingDistance(image_x, image_y)
+            print x, y, hd, hd2
+
+
+
 def main() :
+
+    DerridaDiagram()
+    sys.exit(0);
+
 
 
     DynThresholdExample()
