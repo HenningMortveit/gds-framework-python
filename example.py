@@ -431,6 +431,8 @@ def DerridaDiagram(gds1) :
 #     stateObject = n * [gds.state.State(0, 2)]
 #     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
+    n = gds1.GetDim()
+
     phaseSpace = gds.phase_space.PhaseSpace(gds1);
     F = phaseSpace.GetTransitions()
 
@@ -629,9 +631,9 @@ def main() :
 
     n = 10
     circ = gds.graphs.CircleGraph(n)
-    circ.add_edge( 2, 5 )
+#    circ.add_edge( 2, 5 )
 
-    f = n * [gds.functions.inverseThreshold(2)]
+    f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
@@ -658,7 +660,7 @@ def main() :
         ax = axs[1]
         plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
         ax.set_title(k+1)
-#        plt.gray()
+        plt.gray()
         plt.colorbar()
 
         k+=1
