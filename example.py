@@ -627,9 +627,11 @@ def ComputeAllStats( M ) :
 
 def main() :
 
-    n = 8
+    n = 10
     circ = gds.graphs.CircleGraph(n)
-    f = n * [gds.functions.nor]
+    circ.add_edge( 2, 5 )
+
+    f = n * [gds.functions.inverseThreshold(2)]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
@@ -643,7 +645,7 @@ def main() :
 
     k = 0
 
-    for d in [N1_diagram, N1_diagram, N1_diagram, N1_diagram, ddiag] :
+    for d in [N1_diagram, N2_diagram, N3_diagram, N4_diagram, ddiag] :
 
         fig, axs = plt.subplots(nrows=1, ncols=2, sharex=False)
 
@@ -654,7 +656,7 @@ def main() :
         ax.set_title('Exp/StDev')
 
         ax = axs[1]
-        plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="gaussian")
+        plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
         ax.set_title(k+1)
         plt.gray()
         plt.colorbar()
