@@ -632,11 +632,13 @@ def main() :
     n = 10
     circ = gds.graphs.CircleGraph(n)
     circ.add_edge( 0, 5 )
+    circ.add_edge( 2, 7 )
 
+    f = n * [gds.functions.wolfram(60)]
     f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
-
+    gds1.SetSequence(range(0,n))
 
     N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
 #    print N1_diagram
