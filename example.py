@@ -19,6 +19,7 @@ import networkx as nx
 from networkx.algorithms import *
 import matplotlib.pyplot as plt
 
+import math
 import copy
 import sys
 import cProfile
@@ -420,13 +421,13 @@ def HammingDistance(x,y) :
     return sum( map(NotEqual, x, y) )
 
 def HammingNorm(x) :
-    return HammingDistance(x, len(x)*[0] )
+    return HammingDistance(x, len(x)*[gds.state.State(0, 2)] )
 
 def DerridaDiagram() :
 
-    n = 4
+    n = 5
     circ = gds.graphs.CircleGraph(n)
-    f = n * [gds.functions.majority]
+    f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
@@ -434,7 +435,7 @@ def DerridaDiagram() :
     F = phaseSpace.GetTransitions()
 
     diagram = []
-    for i in range(0, n) :
+    for i in range(0, n+1) :
         diagram.append( (n+1)*[0] )
 
     n = gds1.GetDim();
@@ -454,27 +455,192 @@ def DerridaDiagram() :
         # Convert from index space to state space:
         for j in range(0,n) :
             x[j] = stateObjectList[j].IndexToState( config[j] )
-        image_x =  ng.IndexToTuple( F[i] ) 
+        image_x =  gds1.tupleConverter.IndexToTuple( F[i] ) 
 
         ng2 = copy.deepcopy(ng)
 
         for j in xrange(i+1, nStates) :
             ng2.Next()
             config = ng2.Current()
-            for j in range(0,n) :
-                y[j] = stateObjectList[j].IndexToState( config[j] )
+            for k in range(0,n) :
+                y[k] = stateObjectList[k].IndexToState( config[k] )
 
             hd = HammingDistance(x,y)
             image_y = ng.IndexToTuple( F[j] )
             hd2 = HammingDistance(image_x, image_y)
             diagram[hd][hd2] += 1
-            #print x, y, hd, hd2
+#            print x, y, hd, hd2
+
+        ng.Next()
 
     return diagram
 
+
+def StateSensitivity(gds1) :
+
+    n = gds1.GetDim()
+
+    phaseSpace = gds.phase_space.PhaseSpace(gds1);
+    F = phaseSpace.GetTransitions()
+
+    components = phaseSpace.GetComponents()
+    compID = len(F) * [-1]
+    for comp in range(0, len(components) ):
+        for j in range(0, len(components[comp]) ) :
+            compID[ components[comp][j] ] = comp
+
+    N1_diagram = []
+    for i in range(0, n+1) :
+        N1_diagram.append( (n+1)*[0] )
+
+    N2_diagram = []
+    for i in range(0, n+1) :
+        N2_diagram.append( (n+2)*[0] )
+
+    N3_diagram = []
+    for i in range(0, n+1) :
+        N3_diagram.append( (n+1)*[0] )
+
+    N4_diagram = []
+    for i in range(0, n+1) :
+        N4_diagram.append( (n+2)*[0] )
+
+    n = gds1.GetDim();
+    stateObjectList = gds1.stateObjectList
+    limit = gds1.tupleConverter.limit
+    ng = gds.util.enumeration.NTupleGenerator(limit)
+    nStates = ng.Num()
+
+    x = n*[0]
+    y = n*[0]
+    image_x = n*[0]
+    image_y = n*[0]
+
+    for i in xrange(0, nStates) :
+        config = ng.Current()
+
+        # Convert from index space to state space:
+        for j in range(0,n) :
+            x[j] = stateObjectList[j].IndexToState( config[j] )
+
+        hn = HammingNorm(x)
+        i_image = F[i] 
+        i_comp = compID[i]
+
+        dist = 0
+        n2_set = set()
+        n2_set.add(i_image)
+        comp_dist = 0
+        n4_set = set()
+        n4_set.add(i_comp)
+
+        for j in xrange(0, n) :
+
+            x[j].x = (x[j].x+1) % 2
+            for k in range(0,n) :
+                y[k] = stateObjectList[k].StateToIndex( x[k] )
+            x[j].x = (x[j].x+1) % 2
+
+            index = gds1.tupleConverter.TupleToIndex(y)
+
+            j_image = F[index]
+            n2_set.add(j_image)
+            n4_set.add( compID[index] )
+
+            if i_image != j_image :
+                dist += 1
+            if i_comp != compID[index] :
+                comp_dist += 1
+
+        N1_diagram[hn][dist] += 1
+        N2_diagram[hn][ len(n2_set) ] += 1
+        N3_diagram[hn][ comp_dist ] += 1
+        N4_diagram[hn][ len(n4_set) ] += 1
+        ng.Next()
+        print hn
+        print "N2:", n2_set
+        print "N4:", n4_set
+
+    
+    return N1_diagram, N2_diagram, N3_diagram, N4_diagram
+
+def DiagTranspose(m) :
+    nRows = len(m[0])
+    nCols = len(m)
+    M = []
+    for i in range(0, nRows) :
+        M.append( nCols*[0] )
+
+    for i in range(0, nRows) :
+        for j in range(0, nCols) :
+            M[i][j] = m[j][i]
+
+    return M
+
+def ColumnNormalize(m) :
+    M = copy.deepcopy(m)
+    for i in range(0, len(M) ) :
+        col = M[i]
+        s = float( sum( col ) )
+        if s == 0.0 :
+            continue
+        else :
+            s = 1.0/s
+            for j in range(0, len(col) ):
+                col[j] *= s
+                   
+    return M
+
+
+def ComputeStats( v ) :
+    n = sum(v)
+    avg = 0.0
+    var = 0.0
+    for i in range(0, len(v)) :
+        avg += i*v[i]
+        var += i*(v[i]*v[i])
+    avg = avg/n
+    var = var/n
+    stdev = math.sqrt(var - avg*avg)
+    return  avg, stdev
+
+def ComputeAllStats( M ) :
+    """Compute the average and standard deviation for each element of M"""
+    
+    s = []
+    for i in range(0, len(M)) :
+        s.append( [i, ComputeStats(M[i]) ] )
+    return s
+
+
+
 def main() :
 
-    print DerridaDiagram()
+    print ComputeStats( [2,2,4] )
+    sys.exit(-1)
+
+    n = 8
+    circ = gds.graphs.CircleGraph(n)
+    f = n * [gds.functions.majority]
+    stateObject = n * [gds.state.State(0, 2)]
+    gds1 = gds.gds.GDS(circ, f, stateObject, True)
+
+
+    N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
+    print N1_diagram
+    print N2_diagram
+    print N3_diagram
+    print N4_diagram
+    ddiag = DerridaDiagram()
+
+    stats = ComputeAllStats( N1_diagram )
+
+    plt.imshow(DiagTranspose( ColumnNormalize( ddiag) ), origin="lower")
+    plt.gray()
+    plt.colorbar()
+    plt.show()
+
+
     sys.exit(0);
 
 
