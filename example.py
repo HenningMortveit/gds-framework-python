@@ -658,7 +658,7 @@ def main() :
         ax = axs[1]
         plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
         ax.set_title(k+1)
-        plt.gray()
+#        plt.gray()
         plt.colorbar()
 
         k+=1
