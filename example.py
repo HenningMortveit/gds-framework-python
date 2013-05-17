@@ -631,7 +631,7 @@ def main() :
 
     n = 10
     circ = gds.graphs.CircleGraph(n)
-#    circ.add_edge( 2, 5 )
+    circ.add_edge( 0, 5 )
 
     f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
