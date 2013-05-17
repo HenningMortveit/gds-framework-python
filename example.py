@@ -645,7 +645,7 @@ def main() :
 
     for d in [N1_diagram, N1_diagram, N1_diagram, N1_diagram, ddiag] :
 
-        fig, axs = plt.subplots(nrows=1, ncols=2, sharex=True)
+        fig, axs = plt.subplots(nrows=1, ncols=2, sharex=False)
 
         x, y, yerr = ComputeAllStats( d )
         ax = axs[0]
