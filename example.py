@@ -423,13 +423,13 @@ def HammingDistance(x,y) :
 def HammingNorm(x) :
     return HammingDistance(x, len(x)*[gds.state.State(0, 2)] )
 
-def DerridaDiagram() :
+def DerridaDiagram(gds1) :
 
-    n = 5
-    circ = gds.graphs.CircleGraph(n)
-    f = n * [gds.functions.nor]
-    stateObject = n * [gds.state.State(0, 2)]
-    gds1 = gds.gds.GDS(circ, f, stateObject, True)
+#     n = 4
+#     circ = gds.graphs.CircleGraph(n)
+#     f = n * [gds.functions.nor]
+#     stateObject = n * [gds.state.State(0, 2)]
+#     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
     phaseSpace = gds.phase_space.PhaseSpace(gds1);
     F = phaseSpace.GetTransitions()
@@ -641,7 +641,7 @@ def main() :
 #    print N2_diagram
 #    print N3_diagram
 #    print N4_diagram
-    ddiag = DerridaDiagram()
+    ddiag = DerridaDiagram(gds1)
 
     k = 0
 
