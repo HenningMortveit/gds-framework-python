@@ -631,8 +631,8 @@ def main() :
 
     n = 10
     circ = gds.graphs.CircleGraph(n)
-    circ.add_edge( 0, 5 )
-    circ.add_edge( 2, 7 )
+#    circ.add_edge( 0, 5 )
+#    circ.add_edge( 2, 7 )
 
     f = n * [gds.functions.wolfram(60)]
     f = n * [gds.functions.nor]
@@ -668,6 +668,7 @@ def main() :
         k+=1
 
     plt.show()
+
 
 
     sys.exit(0);
