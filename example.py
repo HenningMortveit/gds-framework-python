@@ -413,7 +413,7 @@ def PhaseSpace() :
     periodicPoints = phaseSpace.GetPeriodicPoints()
     print periodicPoints
 
-def NotEqual(a,b) : 
+def NotEqual(a,b) :
     return a!=b
 
 def HammingDistance(x,y) :
@@ -455,7 +455,7 @@ def DerridaDiagram() :
         # Convert from index space to state space:
         for j in range(0,n) :
             x[j] = stateObjectList[j].IndexToState( config[j] )
-        image_x =  gds1.tupleConverter.IndexToTuple( F[i] ) 
+        image_x =  gds1.tupleConverter.IndexToTuple( F[i] )
 
         ng2 = copy.deepcopy(ng)
 
@@ -524,7 +524,7 @@ def StateSensitivity(gds1) :
             x[j] = stateObjectList[j].IndexToState( config[j] )
 
         hn = HammingNorm(x)
-        i_image = F[i] 
+        i_image = F[i]
         i_comp = compID[i]
 
         dist = 0
@@ -557,11 +557,11 @@ def StateSensitivity(gds1) :
         N3_diagram[hn][ comp_dist ] += 1
         N4_diagram[hn][ len(n4_set) ] += 1
         ng.Next()
-        print hn
-        print "N2:", n2_set
-        print "N4:", n4_set
+#        print hn
+#        print "N2:", n2_set
+#        print "N4:", n4_set
 
-    
+
     return N1_diagram, N2_diagram, N3_diagram, N4_diagram
 
 def DiagTranspose(m) :
@@ -588,56 +588,79 @@ def ColumnNormalize(m) :
             s = 1.0/s
             for j in range(0, len(col) ):
                 col[j] *= s
-                   
+
     return M
 
 
 def ComputeStats( v ) :
     n = sum(v)
+    if n == 0 :
+        return 0, 0
     avg = 0.0
     var = 0.0
     for i in range(0, len(v)) :
-        avg += i*v[i]
-        var += i*(v[i]*v[i])
+        avg += v[i]*i
+        var += v[i]*i*i
     avg = avg/n
-    var = var/n
-    stdev = math.sqrt(var - avg*avg)
+    var = (var - n*avg*avg)
+    stdev = math.sqrt(var/n)
     return  avg, stdev
 
 def ComputeAllStats( M ) :
     """Compute the average and standard deviation for each element of M"""
-    
+
     s = []
     for i in range(0, len(M)) :
         s.append( [i, ComputeStats(M[i]) ] )
-    return s
+
+    x = []
+    y = []
+    yerr = []
+    for v in s :
+        x.append(v[0])
+        y.append(v[1][0])
+        yerr.append(v[1][1])
+
+    return x, y, yerr
 
 
 
 def main() :
 
-    print ComputeStats( [2,2,4] )
-    sys.exit(-1)
-
     n = 8
     circ = gds.graphs.CircleGraph(n)
-    f = n * [gds.functions.majority]
+    f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 
 
     N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
-    print N1_diagram
-    print N2_diagram
-    print N3_diagram
-    print N4_diagram
+#    print N1_diagram
+#    print N2_diagram
+#    print N3_diagram
+#    print N4_diagram
     ddiag = DerridaDiagram()
 
-    stats = ComputeAllStats( N1_diagram )
+    k = 0
 
-    plt.imshow(DiagTranspose( ColumnNormalize( ddiag) ), origin="lower")
-    plt.gray()
-    plt.colorbar()
+    for d in [N1_diagram, N1_diagram, N1_diagram, N1_diagram, ddiag] :
+
+        fig, axs = plt.subplots(nrows=1, ncols=2, sharex=True)
+
+        x, y, yerr = ComputeAllStats( d )
+        ax = axs[0]
+#        ax.set_aspect('equal')
+        ax.errorbar(x, y, yerr=yerr, fmt='o')
+        ax.set_title('Exp/StDev')
+
+        ax = axs[1]
+        plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="gaussian")
+        ax.set_title(k+1)
+        plt.gray()
+        plt.colorbar()
+
+        k+=1
+
     plt.show()
 
 
