@@ -679,7 +679,7 @@ def main() :
 #    plt.show()
 
 
-    fig, axs = plt.subplots(nrows=1, ncols=5, sharex=False, sharey=False)
+    fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=False)
 
     diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
 
