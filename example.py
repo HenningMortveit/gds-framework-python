@@ -19,6 +19,8 @@ import networkx as nx
 from networkx.algorithms import *
 import matplotlib.pyplot as plt
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 import math
 import copy
 import sys
@@ -679,7 +681,7 @@ def main() :
 #    plt.show()
 
 
-    fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=False)
+    fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=True)
 
     diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
 
@@ -692,7 +694,12 @@ def main() :
         ax.set_title(k)
 
         im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
-        plt.colorbar(im)
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+
+        plt.colorbar(im, cax=cax)
+#        plt.colorbar(im)
         plt.gray()
 
         k+=1
