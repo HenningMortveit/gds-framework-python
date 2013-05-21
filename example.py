@@ -461,6 +461,8 @@ def DerridaDiagram(gds1) :
 
         ng2 = copy.deepcopy(ng)
 
+#        print "x", x, image_x
+
         for j in xrange(i+1, nStates) :
             ng2.Next()
             config = ng2.Current()
@@ -471,7 +473,7 @@ def DerridaDiagram(gds1) :
             image_y = ng.IndexToTuple( F[j] )
             hd2 = HammingDistance(image_x, image_y)
             diagram[hd][hd2] += 1
-#            print x, y, hd, hd2
+#            print x, y, image_x, image_y, hd, hd2
 
         ng.Next()
 
@@ -629,41 +631,69 @@ def ComputeAllStats( M ) :
 
 def main() :
 
-    n = 10
+    n = 4
     circ = gds.graphs.CircleGraph(n)
 #    circ.add_edge( 0, 5 )
 #    circ.add_edge( 2, 7 )
 
-    f = n * [gds.functions.wolfram(60)]
+    f = n * [gds.functions.wolfram(150)]
     f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
-    gds1.SetSequence(range(0,n))
+#    gds1.SetSequence(range(0,n))
+
 
     N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
-#    print N1_diagram
-#    print N2_diagram
-#    print N3_diagram
-#    print N4_diagram
     ddiag = DerridaDiagram(gds1)
+
+    print "N1:", N1_diagram
+    print "N2:", N2_diagram
+    print "N3:", N3_diagram
+    print "N4:", N4_diagram
+    print "DD:", ddiag
 
     k = 0
 
     for d in [N1_diagram, N2_diagram, N3_diagram, N4_diagram, ddiag] :
 
         fig, axs = plt.subplots(nrows=1, ncols=2, sharex=False)
+        print "figure:", fig
 
-        x, y, yerr = ComputeAllStats( d )
         ax = axs[0]
-#        ax.set_aspect('equal')
+        x, y, yerr = ComputeAllStats( d )
         ax.errorbar(x, y, yerr=yerr, fmt='o')
         ax.set_title('Exp/StDev')
 
         ax = axs[1]
-        plt.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
-        ax.set_title(k+1)
         plt.gray()
-        plt.colorbar()
+        im = ax.imshow( DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
+        fig.colorbar(im)
+        ax.set_title(k+1)
+
+
+
+        k+=1
+
+
+#    plt.colorbar()
+#    plt.show()
+
+
+    fig, axs = plt.subplots(nrows=1, ncols=5, sharex=False, sharey=False)
+
+    diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
+
+    k = 1
+    im = 0
+    for i in range(0, len(diags)) :
+
+        d = diags[i]
+        ax = plt.subplot(150+k)
+        ax.set_title(k)
+
+        im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
+        plt.colorbar(im)
+        plt.gray()
 
         k+=1
 
