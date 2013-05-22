@@ -24,10 +24,38 @@ from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.backends.backend_pdf import PdfPages
 
+try:
+    import cPickle as pickle
+except:
+    import pickle
+
+import threading
+import multiprocessing
+import thread
 import math
 import copy
 import sys
 import cProfile
+
+
+def LoadObject(filename) :
+    f = file(filename, 'r')
+    u = pickle.Unpickler(f)
+    o = u.load()
+    f.close()  # AA: this was not there before
+    return o;
+
+# ------------------------------------------------------------
+# AA: opposite of LoadObject
+
+def DumpObject(filename,obj) :
+    f = open(filename, 'w')
+    u = pickle.Pickler(f)
+    u.dump(obj)
+    f.close()
+    return 0;
+
+
 
 def PlotExample() :
     X = networkx.Graph()
@@ -632,10 +660,43 @@ def ComputeAllStats( M ) :
 
     return x, y, yerr
 
-def StabilityArray() :
 
-    n = 6
-    m = int( math.ceil( float(n)/2 ) )
+def ComputeDiagrams(gdsList, indexList, diagrams) :
+    for i in indexList :
+        gds1 = gdsList[i]
+        N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
+        ddiag = DerridaDiagram(gds1)
+        #diagrams[i] = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
+        DumpObject("%i.txt" % i, [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram])
+        print "GDS<", i, "> done"
+
+def ComputeStabilityArray(gdsList) :
+
+    m = len(gdsList)
+    diagrams = []
+    for i in range(0,m) :
+        diagrams.append( [] )
+
+    processList = []
+    for j in range(1, m+1) :
+        t = multiprocessing.Process( target=ComputeDiagrams,
+                                     args=( gdsList, [j-1], diagrams) )
+        t.start()
+        processList.append(t)
+
+    for t in processList :
+        t.join()
+
+    # Collect the input:
+    for i in range(0, m) :
+        diagrams[i] = LoadObject("%i.txt" % i)
+
+    return diagrams
+
+
+def PlotStabilityArray(diagrams) :
+
+    m = len(diagrams)
 
     matplotlib.rcParams.update({'font.size': 12})
     pdf_pages = PdfPages('plots.pdf')
@@ -643,34 +704,21 @@ def StabilityArray() :
     fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
     plt.gray()
 
+    for j in range(0, m) :
 
-    for j in range(1, m+1) :
-
-        circ = gds.graphs.CircleGraph(n)
-        if j >= 1 :
-            circ.add_edge( 0, j )
-
-        f = n * [gds.functions.wolfram(150)]
-        stateObject = n * [gds.state.State(0, 2)]
-        gds1 = gds.gds.GDS(circ, f, stateObject, True)
-        # gds1.SetSequence(range(0,n))
-
-        N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
-        ddiag = DerridaDiagram(gds1)
-
-        diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
+        diags = diagrams[j]
 
         for i in range(0, len(diags)) :
 
             d = diags[i]
-            ax = plt.subplot2grid((m,5),(j-1, i))
+            ax = plt.subplot2grid((m,5),(j, i))
             ax.set_title(i+1, fontsize=12)
 
             im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
 
             #divider = make_axes_locatable(ax)
             #cax = divider.append_axes("right", size="5%", pad=0.05)
-            # cbar = plt.colorbar(im, cax=cax)            
+            # cbar = plt.colorbar(im, cax=cax)
             # plt.gca().xaxis.set_major_locator( MaxNLocator(nbins = 7, prune = 'lower') )
             # plt.gca().yaxis.set_major_locator( MaxNLocator(nbins = 6) )
             #cbar.locator = MaxNLocator( nbins = 6)
@@ -688,7 +736,26 @@ def StabilityArray() :
 
 def main() :
 
-    StabilityArray() 
+    n = 10
+    m = int( math.ceil( float(n)/2 ) )
+
+    gdsList = []
+
+    for j in range(1, m+1) :
+
+        circ = gds.graphs.CircleGraph(n)
+        if j >= 1 :
+            circ.add_edge( 0, j )
+
+        f = n * [gds.functions.wolfram(150)]
+        stateObject = n * [gds.state.State(0, 2)]
+        flag = (True) if j == 1 else False
+        gds1 = gds.gds.GDS(circ, f, stateObject, flag)
+        # gds1.SetSequence(range(0,n))
+        gdsList.append(gds1)
+
+    diagrams = ComputeStabilityArray(gdsList)
+    PlotStabilityArray(diagrams)
     sys.exit(-1)
 
 
@@ -719,12 +786,12 @@ def main() :
 
         fig, axs = plt.subplots(nrows=1, ncols=2, sharex=False)
         print "figure:", fig
-        
+
         ax = axs[0]
         x, y, yerr = ComputeAllStats( d )
         ax.errorbar(x, y, yerr=yerr, fmt='o')
         ax.set_title('Exp/StDev', fontsize=12)
-        
+
         ax = axs[1]
         plt.gray()
         im = ax.imshow( DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
@@ -895,7 +962,7 @@ def main() :
     networkx.draw_graphviz(q23)
 # ------------------------------------------------------------
 
-
-main()
+if __name__ == "__main__":
+    main()
 
 #cProfile.run('main()', 'profile.txt')
