@@ -696,15 +696,21 @@ def ComputeStabilityArray(gdsList) :
     return diagrams
 
 
-def PlotStabilityArray(diagrams) :
+def PlotStabilityArray(diagrams, density=True) :
 
     m = len(diagrams)
 
     matplotlib.rcParams.update({'font.size': 12})
-    pdf_pages = PdfPages('plots.pdf')
+    name = 'plots-exp-stdev.pdf'
+    if density == True :
+        name = 'plots-density.pdf'
+
+    pdf_pages = PdfPages(name)
 
     fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
     plt.gray()
+
+    t = ["Derrida", "Sensitivity-1", "Sensitivity-2", "Omega-Limit-1", "Omega-Limit-2"]
 
     for j in range(0, m) :
 
@@ -714,22 +720,34 @@ def PlotStabilityArray(diagrams) :
 
             d = diags[i]
             ax = plt.subplot2grid((m,5),(j, i))
-            ax.set_title(i+1, fontsize=12)
+            if j == 0 :
+                if density == True :
+                    ax.set_title(t[i], fontsize=12)
+                else :
+                    ax.set_title('Exp/StDev', fontsize=12)
 
-            im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
+            if density == False :
+                x, y, yerr = ComputeAllStats( d )
+                ax.errorbar(x, y, yerr=yerr, fmt='o')
 
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = plt.colorbar(im, cax=cax)
-            # plt.gca().xaxis.set_major_locator( MaxNLocator(nbins = 7, prune = 'lower') )
-            # plt.gca().yaxis.set_major_locator( MaxNLocator(nbins = 6) )
-            #cbar.locator = MaxNLocator( nbins = 6)
+            else :
+                im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
+                if i == len(diags) - 1 or i == 0:
+                    divider = make_axes_locatable(ax)
+                    cax = divider.append_axes("right", size="5%", pad=0.05)
+                    if i == 0 :
+                        cbar = plt.colorbar(im, cax=cax, ticks=[0, 0.25, 0.5, 0.75, 1.0])
+                        cbar.ax.set_yticklabels([0, 0.25, 0.5, 0.75, 1.0])
+                    else :
+                        cbar = plt.colorbar(im, cax=cax, ticks=[0, 0.5, 1.0])
+                        cbar.ax.set_yticklabels([0, 0.5, 1.0])
+
 
 
 
 #    plt.tight_layout()
 
-    plt.subplots_adjust(wspace = 0.65)
+#    plt.subplots_adjust(wspace = 0.65)
     pdf_pages.savefig(fig, bbox_inches='tight')
     pdf_pages.close()
     plt.show()
@@ -749,7 +767,8 @@ def main() :
         if j >= 1 :
             circ.add_edge( 0, j )
 
-        f = n * [gds.functions.wolfram(150)]
+#        f = n * [gds.functions.wolfram(1)]
+        f = n * [gds.functions.biThreshold(1,3)]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
@@ -757,7 +776,8 @@ def main() :
         gdsList.append(gds1)
 
     diagrams = ComputeStabilityArray(gdsList)
-    PlotStabilityArray(diagrams)
+    PlotStabilityArray(diagrams, density=True)
+    PlotStabilityArray(diagrams, density=False)
     sys.exit(-1)
 
 
