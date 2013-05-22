@@ -18,8 +18,11 @@ import gds.sequence
 import networkx as nx
 from networkx.algorithms import *
 import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.ticker import MaxNLocator
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.backends.backend_pdf import PdfPages
 
 import math
 import copy
@@ -629,17 +632,73 @@ def ComputeAllStats( M ) :
 
     return x, y, yerr
 
+def StabilityArray() :
+
+    n = 6
+    m = int( math.ceil( float(n)/2 ) )
+
+    matplotlib.rcParams.update({'font.size': 12})
+    pdf_pages = PdfPages('plots.pdf')
+
+    fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
+    plt.gray()
+
+
+    for j in range(1, m+1) :
+
+        circ = gds.graphs.CircleGraph(n)
+        if j >= 1 :
+            circ.add_edge( 0, j )
+
+        f = n * [gds.functions.wolfram(150)]
+        stateObject = n * [gds.state.State(0, 2)]
+        gds1 = gds.gds.GDS(circ, f, stateObject, True)
+        # gds1.SetSequence(range(0,n))
+
+        N1_diagram, N2_diagram, N3_diagram, N4_diagram = StateSensitivity(gds1)
+        ddiag = DerridaDiagram(gds1)
+
+        diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
+
+        for i in range(0, len(diags)) :
+
+            d = diags[i]
+            ax = plt.subplot2grid((m,5),(j-1, i))
+            ax.set_title(i+1, fontsize=12)
+
+            im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
+
+            #divider = make_axes_locatable(ax)
+            #cax = divider.append_axes("right", size="5%", pad=0.05)
+            # cbar = plt.colorbar(im, cax=cax)            
+            # plt.gca().xaxis.set_major_locator( MaxNLocator(nbins = 7, prune = 'lower') )
+            # plt.gca().yaxis.set_major_locator( MaxNLocator(nbins = 6) )
+            #cbar.locator = MaxNLocator( nbins = 6)
+
+
+
+#    plt.tight_layout()
+
+    plt.subplots_adjust(wspace = 0.65)
+    pdf_pages.savefig(fig, bbox_inches='tight')
+    pdf_pages.close()
+    plt.show()
+
 
 
 def main() :
 
-    n = 4
+    StabilityArray() 
+    sys.exit(-1)
+
+
+    n = 10
     circ = gds.graphs.CircleGraph(n)
 #    circ.add_edge( 0, 5 )
 #    circ.add_edge( 2, 7 )
 
     f = n * [gds.functions.wolfram(150)]
-    f = n * [gds.functions.nor]
+#    f = n * [gds.functions.nor]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(circ, f, stateObject, True)
 #    gds1.SetSequence(range(0,n))
@@ -660,28 +719,33 @@ def main() :
 
         fig, axs = plt.subplots(nrows=1, ncols=2, sharex=False)
         print "figure:", fig
-
+        
         ax = axs[0]
         x, y, yerr = ComputeAllStats( d )
         ax.errorbar(x, y, yerr=yerr, fmt='o')
-        ax.set_title('Exp/StDev')
-
+        ax.set_title('Exp/StDev', fontsize=12)
+        
         ax = axs[1]
         plt.gray()
         im = ax.imshow( DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
         fig.colorbar(im)
-        ax.set_title(k+1)
+
+        ax.set_title(k+1, fontsize=12)
 
 
 
         k+=1
 
 
-#    plt.colorbar()
-#    plt.show()
+        #    plt.colorbar()
+        #    plt.show()
 
+
+    matplotlib.rcParams.update({'font.size': 12})
+    pdf_pages = PdfPages('plots.pdf')
 
     fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=True)
+
 
     diags = [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram]
 
@@ -691,19 +755,31 @@ def main() :
 
         d = diags[i]
         ax = plt.subplot(150+k)
-        ax.set_title(k)
+        ax.set_title(k, fontsize=12)
 
         im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
 
+
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(im, cax=cax)
 
-        plt.colorbar(im, cax=cax)
+
+#        plt.gca().xaxis.set_major_locator( MaxNLocator(nbins = 7, prune = 'lower') )
+        plt.gca().yaxis.set_major_locator( MaxNLocator(nbins = 6) )
+        cbar.locator = MaxNLocator( nbins = 6)
+
+
 #        plt.colorbar(im)
         plt.gray()
 
         k+=1
 
+    plt.tight_layout()
+
+    plt.subplots_adjust(wspace = 0.65)
+    pdf_pages.savefig(fig, bbox_inches='tight')
+    pdf_pages.close()
     plt.show()
 
 
