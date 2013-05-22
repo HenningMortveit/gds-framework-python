@@ -670,6 +670,8 @@ def ComputeDiagrams(gdsList, indexList, diagrams) :
         DumpObject("%i.txt" % i, [ddiag, N1_diagram, N2_diagram, N3_diagram, N4_diagram])
         print "GDS<", i, "> done"
 
+
+
 def ComputeStabilityArray(gdsList) :
 
     m = len(gdsList)
@@ -716,9 +718,9 @@ def PlotStabilityArray(diagrams) :
 
             im = ax.imshow(DiagTranspose( ColumnNormalize( d) ), origin="lower", interpolation="nearest")
 
-            #divider = make_axes_locatable(ax)
-            #cax = divider.append_axes("right", size="5%", pad=0.05)
-            # cbar = plt.colorbar(im, cax=cax)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = plt.colorbar(im, cax=cax)
             # plt.gca().xaxis.set_major_locator( MaxNLocator(nbins = 7, prune = 'lower') )
             # plt.gca().yaxis.set_major_locator( MaxNLocator(nbins = 6) )
             #cbar.locator = MaxNLocator( nbins = 6)
