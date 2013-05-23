@@ -15,6 +15,17 @@ import gds.orientation
 import gds.groups
 import gds.sequence
 
+
+from matplotlib import rc
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)
+rc('font', family='serif')
+rc('font', size=10 )
+#    matplotlib.rcParams.update({'font.size': 10})
+
+
 import networkx as nx
 from networkx.algorithms import *
 import matplotlib.pyplot as plt
@@ -700,7 +711,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
     m = len(diagrams)
 
-    matplotlib.rcParams.update({'font.size': 12})
+#    matplotlib.rcParams.update({'font.size': 10})
     name = 'plots-exp-stdev.pdf'
     if density == True :
         name = 'plots-density.pdf'
@@ -710,7 +721,11 @@ def PlotStabilityArray(diagrams, density=True) :
     fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
     plt.gray()
 
-    t = ["Derrida", "Sensitivity-1", "Sensitivity-2", "Omega-Limit-1", "Omega-Limit-2"]
+    t = [r"\noindent Derrida\\diagram", 
+         r"$s(x)/H(x)$ (v.1)", 
+         r"$s(x)/H(x)$ (v.2)", 
+         r"$\omega$-limit (v.1)", 
+         r"$\omega$-limit (v.2)"]
 
     for j in range(0, m) :
 
@@ -722,9 +737,9 @@ def PlotStabilityArray(diagrams, density=True) :
             ax = plt.subplot2grid((m,5),(j, i))
             if j == 0 :
                 if density == True :
-                    ax.set_title(t[i], fontsize=12)
+                    ax.set_title(t[i]) # fontsize=12)
                 else :
-                    ax.set_title('Exp/StDev', fontsize=12)
+                    ax.set_title(t[i]) # 'Exp/StDev') # , fontsize=12)
 
             if density == False :
                 x, y, yerr = ComputeAllStats( d )
@@ -745,7 +760,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 
 
-#    plt.tight_layout()
+    plt.tight_layout()
 
 #    plt.subplots_adjust(wspace = 0.65)
     pdf_pages.savefig(fig, bbox_inches='tight')
@@ -756,7 +771,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 10
+    n = 8
     m = int( math.ceil( float(n)/2 ) )
 
     gdsList = []
