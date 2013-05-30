@@ -18,6 +18,19 @@ def CircleGraph(n) :
     return X
 
 
+def GeneralCircleGraph(n,r) :
+    """Create and return the undirected, generalized circle graph on n
+    vertices where each vertex is connected to all neighbors of
+    distance <= r.
+    """
+
+    X = CircleGraph(n)
+    for i in range(0, n) :
+        for j in range(2, r+1) :
+            X.add_edge( i, (i+j) % n )
+    return X
+
+
 def PathGraph(n) :
     """Create and return undirected path graph on n vertices."""
 

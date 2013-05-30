@@ -23,7 +23,6 @@ from matplotlib import rc
 rc('text', usetex=True)
 rc('font', family='serif')
 rc('font', size=10 )
-#    matplotlib.rcParams.update({'font.size': 10})
 
 
 import networkx as nx
@@ -771,19 +770,24 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 8
+    n = 10
+    r = 2
+
     m = int( math.ceil( float(n)/2 ) )
 
     gdsList = []
 
     for j in range(1, m+1) :
 
-        circ = gds.graphs.CircleGraph(n)
-        if j >= 1 :
+        circ = gds.graphs.GeneralCircleGraph(n,r)
+
+        if j > r :
             circ.add_edge( 0, j )
+        elif j > 1 :
+            continue
 
 #        f = n * [gds.functions.wolfram(1)]
-        f = n * [gds.functions.biThreshold(1,3)]
+        f = n * [gds.functions.biThreshold(3,2)]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
