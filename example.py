@@ -770,7 +770,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 10
+    n = 12
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -785,7 +785,7 @@ def main() :
             circ.add_edge( 0, j )
 
 #        f = n * [gds.functions.wolfram(1)]
-        f = n * [gds.functions.biThreshold(2,6)]
+        f = n * [gds.functions.biThreshold(2,5)]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
