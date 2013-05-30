@@ -777,17 +777,15 @@ def main() :
 
     gdsList = []
 
-    for j in range(1, m+1) :
+    for j in range(r, m+1) :
 
         circ = gds.graphs.GeneralCircleGraph(n,r)
 
         if j > r :
             circ.add_edge( 0, j )
-        elif j > 1 :
-            continue
 
 #        f = n * [gds.functions.wolfram(1)]
-        f = n * [gds.functions.biThreshold(3,2)]
+        f = n * [gds.functions.biThreshold(2,6)]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
