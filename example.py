@@ -720,10 +720,10 @@ def PlotStabilityArray(diagrams, density=True) :
     fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
     plt.gray()
 
-    t = [r"\noindent Derrida\\diagram", 
-         r"$s(x)/H(x)$ (v.1)", 
-         r"$s(x)/H(x)$ (v.2)", 
-         r"$\omega$-limit (v.1)", 
+    t = [r"\noindent Derrida\\diagram",
+         r"$s(x)/H(x)$ (v.1)",
+         r"$s(x)/H(x)$ (v.2)",
+         r"$\omega$-limit (v.1)",
          r"$\omega$-limit (v.2)"]
 
     for j in range(0, m) :
@@ -759,7 +759,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 
 
-    plt.tight_layout()
+    #plt.tight_layout()
 
 #    plt.subplots_adjust(wspace = 0.65)
     pdf_pages.savefig(fig, bbox_inches='tight')
@@ -881,7 +881,7 @@ def main() :
 
         k+=1
 
-    plt.tight_layout()
+    #plt.tight_layout()
 
     plt.subplots_adjust(wspace = 0.65)
     pdf_pages.savefig(fig, bbox_inches='tight')
