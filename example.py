@@ -759,7 +759,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 
 
-    #plt.tight_layout()
+    plt.tight_layout()
 
 #    plt.subplots_adjust(wspace = 0.65)
     pdf_pages.savefig(fig, bbox_inches='tight')
@@ -770,7 +770,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 12
+    n = 10
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -786,6 +786,7 @@ def main() :
 
 #        f = n * [gds.functions.wolfram(1)]
         f = n * [gds.functions.biThreshold(2,5)]
+        f = n * [gds.functions.nor]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
