@@ -770,7 +770,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 10
+    n = 20
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -784,14 +784,24 @@ def main() :
         if j > r :
             circ.add_edge( 0, j )
 
+
 #        f = n * [gds.functions.wolfram(1)]
         f = n * [gds.functions.biThreshold(2,5)]
-        f = n * [gds.functions.nor]
+        f = n * [gds.functions.parity]
+#        f = n * [gds.functions.nor]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
+        flag = False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
-        # gds1.SetSequence(range(0,n))
+        #gds1.SetSequence(range(0,n))
         gdsList.append(gds1)
+
+        phaseSpace = gds.phase_space.PhaseSpace(gds1);
+        pp = phaseSpace.GetPeriodicPoints()
+        sizes = [len(i) for i in pp]
+        s = sum(sizes)
+        print j, len(pp), s #, sizes
+        print ""
 
     diagrams = ComputeStabilityArray(gdsList)
     PlotStabilityArray(diagrams, density=True)
