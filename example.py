@@ -523,18 +523,71 @@ def DerridaDiagram(gds1) :
     return diagram
 
 
-def StateSensitivity(gds1) :
+def ComputeGDSPhaseSpaceProps(gds1) :
 
     n = gds1.GetDim()
 
     phaseSpace = gds.phase_space.PhaseSpace(gds1);
-    F = phaseSpace.GetTransitions()
 
-    components = phaseSpace.GetComponents()
+    F = phaseSpace.GetTransitions()
+    componentList = phaseSpace.GetComponents()
+    attractorList = phaseSpace.GetPeriodicPoints()
+
     compID = len(F) * [-1]
-    for comp in range(0, len(components) ):
-        for j in range(0, len(components[comp]) ) :
-            compID[ components[comp][j] ] = comp
+
+    for componentID in range(0, len(componentList) ):
+        for j in range(0, len(componentList[componentID]) ) :
+            compID[ componentList[componentID][j] ] = componentID
+
+    attractorToComponentMap = len(attractorList) * [-1]
+    componentToAttractorMap = len(componentList) * [-1]
+
+    j = 0
+    for attractor in attractorList :
+        attractorToComponentMap[j] = compID[ attractor[0] ]
+        componentToAttractorMap[ compID[ attractor[0] ] ] = j
+        j += 1
+
+    return F, componentList, attractorList, compID, attractorToComponentMap, componentToAttractorMap
+
+
+def AttractorMatrix(gds1) :
+    n = gds1.GetDim()
+
+    _, _, attractorList, compID, _, componentToAttractorMap = ComputeGDSPhaseSpaceProps(gds1)
+
+    numAttractors = len(attractorList)
+
+    attractorMatrix = []
+    
+    j = 0
+    for attractor in attractorList :
+
+        nStates = len(attractor)
+        nPerturbations = n * nStates
+        fraction = 1.0/float( nPerturbations )
+
+        attractorMatrix.append( [0.0] * numAttractors )
+
+        for stateIndex in attractor :
+            state = gds1.IntegerToState(stateIndex)
+            for i in range(0,n) :
+                state[i].x = 0 if state[i].x == 1 else 1
+                nborIndex = gds1.StateToInteger(state)
+                state[i].x = 0 if state[i].x == 1 else 1
+                attractorID = componentToAttractorMap[ compID[nborIndex] ]
+                attractorMatrix[j][ attractorID ] += 1.0
+
+        j += 1
+
+
+    return attractorMatrix
+
+def StateSensitivity(gds1) :
+
+    n = gds1.GetDim()
+
+    F, _, _, compID, _, _ = ComputeGDSPhaseSpaceProps(gds1)
 
     N1_diagram = []
     for i in range(0, n+1) :
@@ -770,8 +823,8 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 20
-    r = 2
+    n = 4
+    r = 1
 
     m = int( math.ceil( float(n)/2 ) )
 
@@ -796,11 +849,16 @@ def main() :
         #gds1.SetSequence(range(0,n))
         gdsList.append(gds1)
 
+        print AttractorMatrix(gds1)
+
+
         phaseSpace = gds.phase_space.PhaseSpace(gds1);
         pp = phaseSpace.GetPeriodicPoints()
+        c = phaseSpace.GetComponents() 
+
         sizes = [len(i) for i in pp]
         s = sum(sizes)
-        print j, len(pp), s #, sizes
+        print j, len(pp), s, pp #, sizes
         print ""
 
     diagrams = ComputeStabilityArray(gdsList)
