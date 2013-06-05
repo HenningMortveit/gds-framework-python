@@ -27,6 +27,7 @@ import gds.sequence
 
 import networkx as nx
 from networkx.algorithms import *
+
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import MaxNLocator
@@ -46,7 +47,7 @@ import math
 import copy
 import sys
 import cProfile
-
+import numpy
 
 def LoadObject(filename) :
     f = file(filename, 'r')
@@ -716,12 +717,34 @@ def ComputeAllStats( M ) :
     return x, y, yerr
 
 def AttractorMatrixStats(gds1) :
-    print AttractorMatrix(gds1)
+
+    t = 1
+
+    A = AttractorMatrix(gds1)
+    if len(A) == 0 :
+        return 
+
+    dim = len(A[0])
+    g = nx.DiGraph()
+    g.add_nodes_from( range(0, dim) )
+
+    i = 0
+    for row in A :
+        for j in range(0,dim) :
+            if A[i][j] >= t :
+                g.add_edge(i, j)
+        i += 1
+
+    components = nx.algorithms.weakly_connected_components(g)
+    print len(components), components
 
 
 def AttractorMatrixList(gdsList) :
+    j = 0
     for g in gdsList :
+        print j
         AttractorMatrixStats(g)
+        j += 1
 
 def ComputeDiagrams(gdsList, indexList, diagrams) :
     for i in indexList :
@@ -824,7 +847,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n =10
+    n =12
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -840,8 +863,8 @@ def main() :
 
 
 #        f = n * [gds.functions.wolfram(1)]
-        f = n * [gds.functions.biThreshold(2,5)]
-        f = n * [gds.functions.parity]
+        f = n * [gds.functions.biThreshold(2,4)]
+#        f = n * [gds.functions.parity]
 #        f = n * [gds.functions.nor]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
@@ -863,9 +886,9 @@ def main() :
         # print ""
 
     AttractorMatrixList(gdsList)
-    diagrams = ComputeStabilityArray(gdsList)
-    PlotStabilityArray(diagrams, density=True)
-    PlotStabilityArray(diagrams, density=False)
+    #diagrams = ComputeStabilityArray(gdsList)
+    #PlotStabilityArray(diagrams, density=True)
+    #PlotStabilityArray(diagrams, density=False)
     sys.exit(-1)
 
 
