@@ -847,7 +847,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n =12
+    n =16
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -864,13 +864,13 @@ def main() :
 
 #        f = n * [gds.functions.wolfram(1)]
         f = n * [gds.functions.biThreshold(2,4)]
-#        f = n * [gds.functions.parity]
+        f = n * [gds.functions.parity]
 #        f = n * [gds.functions.nor]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         flag = False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
-        #gds1.SetSequence(range(0,n))
+        gds1.SetSequence(range(0,n))
         gdsList.append(gds1)
 
 
