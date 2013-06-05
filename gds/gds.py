@@ -20,6 +20,11 @@ class GDS :
         self.sequence = None
         self.blockSequence = None
 
+    def NumStates(self) :
+        limit = self.tupleConverter.limit
+        ng = util.enumeration.NTupleGenerator(limit)
+        return ng.Num()
+
 
     def SetGraph(self, g, stateObjectList, circleFlag = False) :
         self.g = g

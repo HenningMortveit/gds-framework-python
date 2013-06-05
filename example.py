@@ -585,9 +585,16 @@ def AttractorMatrix(gds1) :
 
 def StateSensitivity(gds1) :
 
-    n = gds1.GetDim()
+    """Computes:
+    N1 - histogram of state sensitivity split by Hamming norm
+    N2 - histogram of number of unique images in 1-neighborhood split by Hamming norm
+    N3 - histogram of attractor sensitivity split by Hamming norm
+    N4 - histogram of number of attractors in 1-neighborhood split by Hamming norm
+    """
 
     F, _, _, compID, _, _ = ComputeGDSPhaseSpaceProps(gds1)
+
+    n = gds1.GetDim()
 
     N1_diagram = []
     for i in range(0, n+1) :
@@ -605,23 +612,11 @@ def StateSensitivity(gds1) :
     for i in range(0, n+1) :
         N4_diagram.append( (n+2)*[0] )
 
-    n = gds1.GetDim();
-    stateObjectList = gds1.stateObjectList
-    limit = gds1.tupleConverter.limit
-    ng = gds.util.enumeration.NTupleGenerator(limit)
-    nStates = ng.Num()
-
-    x = n*[0]
-    y = n*[0]
-    image_x = n*[0]
-    image_y = n*[0]
+    nStates = gds1.NumStates()
 
     for i in xrange(0, nStates) :
-        config = ng.Current()
 
-        # Convert from index space to state space:
-        for j in range(0,n) :
-            x[j] = stateObjectList[j].IndexToState( config[j] )
+        x = gds1.IntegerToState(i)
 
         hn = HammingNorm(x)
         i_image = F[i]
@@ -637,11 +632,8 @@ def StateSensitivity(gds1) :
         for j in xrange(0, n) :
 
             x[j].x = (x[j].x+1) % 2
-            for k in range(0,n) :
-                y[k] = stateObjectList[k].StateToIndex( x[k] )
+            index = gds1.StateToInteger(x)
             x[j].x = (x[j].x+1) % 2
-
-            index = gds1.tupleConverter.TupleToIndex(y)
 
             j_image = F[index]
             n2_set.add(j_image)
@@ -656,7 +648,7 @@ def StateSensitivity(gds1) :
         N2_diagram[hn][ len(n2_set) ] += 1
         N3_diagram[hn][ comp_dist ] += 1
         N4_diagram[hn][ len(n4_set) ] += 1
-        ng.Next()
+
 #        print hn
 #        print "N2:", n2_set
 #        print "N4:", n4_set
@@ -723,6 +715,13 @@ def ComputeAllStats( M ) :
 
     return x, y, yerr
 
+def AttractorMatrixStats(gds1) :
+    print AttractorMatrix(gds1)
+
+
+def AttractorMatrixList(gdsList) :
+    for g in gdsList :
+        AttractorMatrixStats(g)
 
 def ComputeDiagrams(gdsList, indexList, diagrams) :
     for i in indexList :
@@ -823,8 +822,8 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n = 4
-    r = 1
+    n =10
+    r = 2
 
     m = int( math.ceil( float(n)/2 ) )
 
@@ -849,18 +848,19 @@ def main() :
         #gds1.SetSequence(range(0,n))
         gdsList.append(gds1)
 
-        print AttractorMatrix(gds1)
 
 
-        phaseSpace = gds.phase_space.PhaseSpace(gds1);
-        pp = phaseSpace.GetPeriodicPoints()
-        c = phaseSpace.GetComponents() 
 
-        sizes = [len(i) for i in pp]
-        s = sum(sizes)
-        print j, len(pp), s, pp #, sizes
-        print ""
+        # phaseSpace = gds.phase_space.PhaseSpace(gds1);
+        # pp = phaseSpace.GetPeriodicPoints()
+        # c = phaseSpace.GetComponents() 
 
+        # sizes = [len(i) for i in pp]
+        # s = sum(sizes)
+        # print j, len(pp), s, pp #, sizes
+        # print ""
+
+    AttractorMatrixList(gdsList)
     diagrams = ComputeStabilityArray(gdsList)
     PlotStabilityArray(diagrams, density=True)
     PlotStabilityArray(diagrams, density=False)
