@@ -16,13 +16,13 @@ import gds.groups
 import gds.sequence
 
 
-from matplotlib import rc
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-## for Palatino and other serif fonts use:
-#rc('font',**{'family':'serif','serif':['Palatino']})
-rc('text', usetex=True)
-rc('font', family='serif')
-rc('font', size=10 )
+# from matplotlib import rc
+# #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+# ## for Palatino and other serif fonts use:
+# #rc('font',**{'family':'serif','serif':['Palatino']})
+# rc('text', usetex=True)
+# rc('font', family='serif')
+# rc('font', size=10 )
 
 
 import networkx as nx
@@ -777,6 +777,8 @@ def PlotStabilityArray(diagrams, density=True) :
          r"$s(x)/H(x)$ (v.2)",
          r"$\omega$-limit (v.1)",
          r"$\omega$-limit (v.2)"]
+
+    t = ["1", "2", "3", "4", "5"]
 
     for j in range(0, m) :
 
