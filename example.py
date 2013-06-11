@@ -15,14 +15,17 @@ import gds.orientation
 import gds.groups
 import gds.sequence
 
+useTeX=True
 
-# from matplotlib import rc
-# #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-# ## for Palatino and other serif fonts use:
-# #rc('font',**{'family':'serif','serif':['Palatino']})
-# rc('text', usetex=True)
-# rc('font', family='serif')
-# rc('font', size=10 )
+if useTeX == True :
+    from matplotlib import rc
+    # #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    # ## for Palatino and other serif fonts use:
+    # #rc('font',**{'family':'serif','serif':['Palatino']})
+    rc('text', usetex=True)
+    rc('font', family='serif')
+    rc('font', size=10 )
+
 
 
 import networkx as nx
@@ -716,9 +719,9 @@ def ComputeAllStats( M ) :
 
     return x, y, yerr
 
-def AttractorMatrixStats(gds1) :
+def AttractorMatrixStats(gds1, threshold) :
 
-    t = 1
+    t = threshold
 
     A = AttractorMatrix(gds1)
     if len(A) == 0 :
@@ -739,11 +742,11 @@ def AttractorMatrixStats(gds1) :
     print len(components), components
 
 
-def AttractorMatrixList(gdsList) :
+def AttractorMatrixList(gdsList, threshold) :
     j = 0
     for g in gdsList :
         print j
-        AttractorMatrixStats(g)
+        AttractorMatrixStats(g, threshold)
         j += 1
 
 def ComputeDiagrams(gdsList, indexList, diagrams) :
@@ -795,13 +798,15 @@ def PlotStabilityArray(diagrams, density=True) :
     fig, axs = plt.subplots(nrows=m, ncols=5, sharex=True, sharey=True)
     plt.gray()
 
-    t = [r"\noindent Derrida\\diagram",
-         r"$s(x)/H(x)$ (v.1)",
-         r"$s(x)/H(x)$ (v.2)",
-         r"$\omega$-limit (v.1)",
-         r"$\omega$-limit (v.2)"]
+    if useTeX == True :
+        t = [r"\noindent Derrida\\diagram",
+             r"$s(x)/H(x)$ (v.1)",
+             r"$s(x)/H(x)$ (v.2)",
+             r"$\omega$-limit (v.1)",
+             r"$\omega$-limit (v.2)"]
 
-    t = ["1", "2", "3", "4", "5"]
+    else :
+        t = ["1", "2", "3", "4", "5"]
 
     for j in range(0, m) :
 
@@ -847,7 +852,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    n =12
+    n =10
     r = 2
 
     m = int( math.ceil( float(n)/2 ) )
@@ -864,13 +869,13 @@ def main() :
 
 #        f = n * [gds.functions.wolfram(1)]
         f = n * [gds.functions.biThreshold(2,4)]
-#        f = n * [gds.functions.parity]
+        f = n * [gds.functions.parity]
 #        f = n * [gds.functions.nor]
         stateObject = n * [gds.state.State(0, 2)]
         flag = (True) if j == 1 else False
         flag = False
         gds1 = gds.gds.GDS(circ, f, stateObject, flag)
-        gds1.SetSequence(range(0,n))
+#        gds1.SetSequence(range(0,n))
         gdsList.append(gds1)
 
 
@@ -885,10 +890,11 @@ def main() :
         # print j, len(pp), s, pp #, sizes
         # print ""
 
-    AttractorMatrixList(gdsList)
-    #diagrams = ComputeStabilityArray(gdsList)
-    #PlotStabilityArray(diagrams, density=True)
-    #PlotStabilityArray(diagrams, density=False)
+    threshold = 50
+    AttractorMatrixList(gdsList, threshold)
+    diagrams = ComputeStabilityArray(gdsList)
+    PlotStabilityArray(diagrams, density=True)
+    PlotStabilityArray(diagrams, density=False)
     sys.exit(-1)
 
 
