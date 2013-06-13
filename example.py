@@ -563,7 +563,7 @@ def AttractorMatrix(gds1) :
     numAttractors = len(attractorList)
 
     attractorMatrix = []
-    
+
     j = 0
     for attractor in attractorList :
 
@@ -725,7 +725,7 @@ def AttractorMatrixStats(gds1, threshold) :
 
     A = AttractorMatrix(gds1)
     if len(A) == 0 :
-        return 
+        return
 
     dim = len(A[0])
     g = nx.DiGraph()
@@ -738,7 +738,9 @@ def AttractorMatrixStats(gds1, threshold) :
                 g.add_edge(i, j)
         i += 1
 
-    components = nx.algorithms.weakly_connected_components(g)
+    #components = nx.algorithms.weakly_connected_components(g)
+    components = nx.algorithms.attracting_components(g)
+
     print len(components), components
 
 
@@ -883,7 +885,7 @@ def main() :
 
         # phaseSpace = gds.phase_space.PhaseSpace(gds1);
         # pp = phaseSpace.GetPeriodicPoints()
-        # c = phaseSpace.GetComponents() 
+        # c = phaseSpace.GetComponents()
 
         # sizes = [len(i) for i in pp]
         # s = sum(sizes)
