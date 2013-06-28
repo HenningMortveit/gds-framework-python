@@ -71,6 +71,29 @@ def DumpObject(filename,obj) :
 
 
 
+def StabilityExpExample() :
+    n = 4
+
+    X = gds.graphs.CircleGraph(n)
+    X.add_edge(0, 2);
+
+    stateObject = n * [gds.state.State(0, 2)]
+    f = n * [gds.functions.biThreshold(1,3)]
+
+    gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
+#    gds1.SetSequence(pi)
+#    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    print transitions
+
+    p = gds.phase_space.PhaseSpace(gds1)
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    print fixedPoints
+    print periodicPoints
+
+
 def PlotExample() :
     X = networkx.Graph()
     X.add_edge( 0, 1);
@@ -109,25 +132,14 @@ def BiThresholdExample() :
     n = 4
     pi = [0,1,2,3];
     X = gds.graphs.CircleGraph(n)
-    doCircle = True
-#    X = gds.graphs.WheelGraph(n-1)
-#    X = gds.graphs.HyperCube(dim = 3, base = 2)
+    doCircle = False
+    X.add_edge(0,2)
+
     f = n * [gds.functions.biThreshold(1,3)]
-#    one  = gds.state.State(1, 2)
-#    zero = gds.state.State(0, 2)
-
-#     s = [one,zero,zero]
-#     i = [0,1,2]
-#     print f[0](s,i,1)
-#     sys.exit(0)
-
     stateObject = n * [gds.state.State(0, 2)]
-
-
     gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
-    gds1.SetSequence(pi)
+    gds1.S etSequence(pi)
 #    gds1.SetParallel()
-
 
     transitions = gds.algorithms.GenerateTransitions(gds1)
     fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
@@ -154,6 +166,8 @@ def BiThresholdExample() :
         print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
     return transitions
+
+
 
 def DynThresholdExample() :
 
@@ -853,6 +867,11 @@ def PlotStabilityArray(diagrams, density=True) :
 
 
 def main() :
+
+    BiThresholdExample()
+    sys.exit(0)
+
+
 
     n =10
     r = 2
