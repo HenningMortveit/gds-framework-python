@@ -133,12 +133,12 @@ def BiThresholdExample() :
     pi = [0,1,2,3];
     X = gds.graphs.CircleGraph(n)
     doCircle = False
-    X.add_edge(0,2)
+#    X.add_edge(0,2)
 
     f = n * [gds.functions.biThreshold(1,3)]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
-    gds1.S etSequence(pi)
+    gds1.SetSequence(pi)
 #    gds1.SetParallel()
 
     transitions = gds.algorithms.GenerateTransitions(gds1)
@@ -173,7 +173,7 @@ def DynThresholdExample() :
 
     n = 5
 
-    X = gds.graphs.StarGraph(n)
+    X = gds.graphs.CircleGraph(n)
     stateObject = (n+1) * [gds.state.StateDynT(0, 1, 1)]
     stateObject[0] = gds.state.StateDynT(0,1, n)
 
@@ -193,6 +193,48 @@ def DynThresholdExample() :
     print "Fixed points: %i" % len(fixedPoints)
     for i in fixedPoints :
         print i, gds1.IntegerToState(i)
+
+
+def DynThresholdExample1() :
+    n = 4
+    pi = [0,1,2,3]
+    
+    X = gds.graphs.CircleGraph(n)
+    stateObject = n * [gds.state.StateDynT(0, 2, 2)]
+    #stateObject[0] = gds.state.StateDynT(0,1, n)
+
+    f = n * [gds.functions.f_up_down]
+
+    gds1 = gds.gds.GDS(X, f, stateObject, True)
+    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    #print "Fixed points: %i" % len(fixedPoints)
+    #for i in fixedPoints :
+    #    print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    file = open("result.txt",'w')
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            data = repr(gds1.IntegerToState(j))
+            file.write("%i:\n%s\n" %(i, data))
+    file.close()
+
+    #print "Components: ", components
+
+    #for x,y in enumerate(transitions) :
+    #    print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
 
 def SDSExample() :
     """Basic example for phase space on X = Circle_4."""
@@ -872,7 +914,7 @@ def main() :
     sys.exit(0)
 
 
-
+    '''
     n =10
     r = 2
 
@@ -1012,10 +1054,10 @@ def main() :
 
 
     sys.exit(0);
+    '''
 
 
-
-    DynThresholdExample()
+    DynThresholdExample1()
     sys.exit(0)
 
     BiThresholdExample()
