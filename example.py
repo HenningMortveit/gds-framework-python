@@ -173,7 +173,7 @@ def DynThresholdExample() :
 
     n = 5
 
-    X = gds.graphs.CircleGraph(n)
+    X = gds.graphs.StarGraph(n)
     stateObject = (n+1) * [gds.state.StateDynT(0, 1, 1)]
     stateObject[0] = gds.state.StateDynT(0,1, n)
 
@@ -217,18 +217,59 @@ def DynThresholdExample1() :
     periodicPoints = p.GetPeriodicPoints()
     components = p.GetComponents()
 
+    print "Fixed points: %i" % len(fixedPoints)
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
+def DynBiThresholdExample() :
+    """SW: basic example for dynamic bi-threshold system"""
+
+    n = 3
+    pi = [0,1,2,3]
+
+    X = gds.graphs.StarGraph(n)
+    stateObject = (n+1) * [gds.state.StateDynBiT(0, 1, 3, 2)]
+    stateObject[0] = gds.state.StateDynBiT(0,1,3,n)
+
+    f = (n+1) * [gds.functions.dynBiThreshold(-1, 1, 1, -1)]
+
+    gds1 = gds.gds.GDS(X, f, stateObject, True)
+    #gds1.SetSequence(pi)
+    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
     #print "Fixed points: %i" % len(fixedPoints)
     #for i in fixedPoints :
     #    print i, gds1.IntegerToState(i)
 
     print "Periodic points: "
-    file = open("result.txt",'w')
+    file = open("DynBi_Per.txt",'w')
     for i, cycle in enumerate(periodicPoints) :
-        print i
+        file.write("%i:\n" %i)
         for j in cycle :
             data = repr(gds1.IntegerToState(j))
-            file.write("%i:\n%s\n" %(i, data))
+            file.write("%s\n" %data)
     file.close()
+
 
     #print "Components: ", components
 
@@ -910,7 +951,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    BiThresholdExample()
+    DynBiThresholdExample()
     sys.exit(0)
 
 

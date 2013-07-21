@@ -96,15 +96,16 @@ class StateDynT :
         return self.x != other.x or self.k != other.k
 
 
-Class StateDynBiT :
-    """Sate for dynamic bi-threshold GDS."""
+class StateDynBiT :
+    """SW: Sate for dynamic bi-threshold GDS. The up-threshold ranges from 0 to degree+1,
+    and the down-threshold ranges from 1 to degree+2"""
 
-    def __init__(self, x = 0, kup = 1, kdown = 1, drgree = 2) :
+    def __init__(self, x = 0, kup = 1, kdown = 1, degree = 2) :
         self.x = x
         self.kup = kup
         self.kdown = kdown
         self.degree = degree
-        self.num = 2 * (self.degree + 2) * (self.degree +2)
+        self.num = 2 * (self.degree + 2) * (self.degree + 2)
 
     def __repr__(self) :
         return "(%i, %i, %i)" % (self.x, self.kup, self.kdown)
@@ -113,12 +114,12 @@ Class StateDynBiT :
         return self.num
 
     def StateToIndex(self, s ) :
-        return s.x * 2 *(s.degree + 2) + s.kup * (s.degree + 2) + s.kdown - 1 
+        return s.x * (s.degree + 2) *(s.degree + 2) + s.kup * (s.degree + 2) + s.kdown - 1 
 
     def IndexToState(self, i) :
         kdown = (i % (self.degree + 2)) + 1
-        kup = (i % ((self.degree + 2) * (self.degree + 2)) / (self.degree + 2)
-        x = i / ((self.degree +2) * (self.degree + 2))
+        kup = (i / (self.degree + 2)) % (self.degree + 2)
+        x = i / ((self.degree + 2) * (self.degree + 2))
         return StateDynBiT(x, kup, kdown, self.degree)
 
     def __eq__(self, other) :

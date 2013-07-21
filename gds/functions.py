@@ -93,6 +93,32 @@ class inverseThreshold :
             sum += s[j].x
         return state.State( 1 if sum <= self.k else 0, 2)
 
+class dynBiThreshold :
+    """SW: Dynamic bi-threshold rule"""
+
+    def __init__(self, D01up, D10up, D01down, D10down) :
+        self.D01up = D01up
+        self.D10up = D10up
+        self.D01down = D01down
+        self.D10down = D10down
+
+    def __call__(self, s, indexList, i) :
+        sum = 0
+        for j in indexList :
+            sum += s[j].x
+
+        if s[i].x == 0 and sum >= s[i].kup :
+            s[i].kup = s[i].kup + self.D01up
+            s[i].kdown = s[i].kdown + self.D01down
+            return state.StateDynBiT(1, s[i].kup, s[i].kdown, s[i].degree)
+        elif s[i].x == 1 and sum < s[i].kdown :
+            s[i].kup = s[i].kup + self.D10up
+            s[i].kdown = s[i].kdown + self.D10down
+            return state.StateDynBiT(0, s[i].kup, s[i].kdown, s[i].degree)
+        else :
+            return s[i]
+
+
 
 # Wolfram's/vonNeumann's basic cellular automata rules.
 
@@ -170,3 +196,4 @@ def f_up_down(s, indexList, i) :
         k = s[i].k + 1
 
     return state.StateDynT(x, k, s[i].degree)
+
