@@ -954,8 +954,6 @@ def main() :
     DynBiThresholdExample()
     sys.exit(0)
 
-
-    '''
     n =10
     r = 2
 
@@ -1095,8 +1093,6 @@ def main() :
 
 
     sys.exit(0);
-    '''
-
 
     DynThresholdExample1()
     sys.exit(0)
