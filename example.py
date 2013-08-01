@@ -235,18 +235,18 @@ def DynThresholdExample1() :
 def DynBiThresholdExample() :
     """SW: basic example for dynamic bi-threshold system"""
 
-    n = 3
+    n = 4
     pi = [0,1,2,3]
 
-    X = gds.graphs.StarGraph(n)
-    stateObject = (n+1) * [gds.state.StateDynBiT(0, 1, 3, 2)]
-    stateObject[0] = gds.state.StateDynBiT(0,1,3,n)
+    X = gds.graphs.CircleGraph(n)
+    stateObject = n * [gds.state.StateDynBiT(0, 1, 3, 2)]
+    #stateObject[0] = gds.state.StateDynBiT(0,1,3,n)
 
-    f = (n+1) * [gds.functions.dynBiThreshold(-1, 1, 1, -1)]
+    f = n * [gds.functions.dynBiThreshold(0, 0, 1, -1)]
 
     gds1 = gds.gds.GDS(X, f, stateObject, True)
-    #gds1.SetSequence(pi)
-    gds1.SetParallel()
+    gds1.SetSequence(pi)
+    #gds1.SetParallel()
 
     transitions = gds.algorithms.GenerateTransitions(gds1)
     fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)

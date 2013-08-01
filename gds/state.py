@@ -118,8 +118,8 @@ class StateDynBiT :
 
     def IndexToState(self, i) :
         kdown = (i % (self.degree + 2)) + 1
-        kup = (i / (self.degree + 2)) % (self.degree + 2)
-        x = i / ((self.degree + 2) * (self.degree + 2))
+        kup = ((i+1) / (self.degree + 2)) % (self.degree + 2)
+        x = (i+1) / ((self.degree + 2) * (self.degree + 2))
         return StateDynBiT(x, kup, kdown, self.degree)
 
     def __eq__(self, other) :
