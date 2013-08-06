@@ -197,3 +197,21 @@ def f_up_down(s, indexList, i) :
 
     return state.StateDynT(x, k, s[i].degree)
 
+def perBiThreshold(s, indexList, i) :
+    """"""
+
+    sum = 0
+    for j in indexList :
+          sum += s[j].x
+
+    if s[i].x == 0 and sum >= s[i].kup :
+        s[i].up = (s[i].kup % 3) + 1
+        s[i].kdown = (s[i].kdown % 3) + 1
+        return state.StatePerBiT(1, s[i].kup, s[i].kdown, s[i].degree)
+    elif s[i].x == 1 and sum < s[i].kdown :
+        s[i].kup = (s[i].kup % 3) + 1
+        s[i].kdown = (s[i].kdown % 3) + 1
+        return state.StatePerBiT(0, s[i].kup, s[i].kdown, s[i].degree)
+    else :
+        return s[i]
+

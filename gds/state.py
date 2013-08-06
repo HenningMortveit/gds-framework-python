@@ -117,7 +117,7 @@ class StateDynBiT :
         return s.x * (s.degree + 2) *(s.degree + 2) + s.kup * (s.degree + 2) + s.kdown - 1 
 
     def IndexToState(self, i) :
-        kdown = (i % (self.degree + 2)) + 1
+        kdown = (i % (self.degree + 2))+1
         kup = ((i+1) / (self.degree + 2)) % (self.degree + 2)
         x = (i+1) / ((self.degree + 2) * (self.degree + 2))
         return StateDynBiT(x, kup, kdown, self.degree)
@@ -128,3 +128,34 @@ class StateDynBiT :
     def __ne__(self, other) :
         return self.x != other.x or self.kup != other.kup or self.kdown != other.kdown
 
+
+class StatePerBiT :
+    """SW: the period for the threshold change is 3"""
+    
+    def __init__(self, x = 0, kup = 1, kdown = 2, degree = 2) :
+        self.x = x
+        self.kup = kup
+        self.kdown = kdown
+        self.degree = degree
+        self.num = 6
+
+    def __repr__(self) :
+        return "(%i, %i, %i)" % (self.x, self.kup, self.kdown)
+
+    def Num(self) :
+        return self.num
+
+    def StateToIndex(self, s ) :
+        return s.x * 3 + s.kup - 1
+
+    def IndexToState(self, i) :
+        x = i / 3
+        kup = i % 3 + 1
+        kdown = kup % 3 + 1  
+        return StatePerBiT(x, kup, kdown, self.degree)
+
+    def __eq__(self, other) :
+        return self.x == other.x and self.kup == other.kup and self.kdown == other.kdown
+
+    def __ne__(self, other) :
+        return self.x != other.x or self.kup != other.kup or self.kdown != other.kdown
