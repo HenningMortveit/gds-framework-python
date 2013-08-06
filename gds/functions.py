@@ -205,11 +205,11 @@ def perBiThreshold(s, indexList, i) :
           sum += s[j].x
 
     if s[i].x == 0 and sum >= s[i].kup :
-        s[i].up = (s[i].kup % 3) + 1
+        s[i].up = (s[i].kup +1) % 3
         s[i].kdown = (s[i].kdown % 3) + 1
         return state.StatePerBiT(1, s[i].kup, s[i].kdown, s[i].degree)
     elif s[i].x == 1 and sum < s[i].kdown :
-        s[i].kup = (s[i].kup % 3) + 1
+        s[i].kup = (s[i].kup + 1) % 3
         s[i].kdown = (s[i].kdown % 3) + 1
         return state.StatePerBiT(0, s[i].kup, s[i].kdown, s[i].degree)
     else :

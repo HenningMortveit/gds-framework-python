@@ -146,12 +146,12 @@ class StatePerBiT :
         return self.num
 
     def StateToIndex(self, s ) :
-        return s.x * 3 + s.kup - 1
+        return s.x * 3 + s.kup
 
     def IndexToState(self, i) :
         x = i / 3
-        kup = i % 3 + 1
-        kdown = kup % 3 + 1  
+        kup = i % 3
+        kdown = kup + 1  
         return StatePerBiT(x, kup, kdown, self.degree)
 
     def __eq__(self, other) :

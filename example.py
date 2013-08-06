@@ -316,10 +316,10 @@ def PerBiThresholdExample() :
     file.close()
 
 
-    print "Components: ", components
+    #print "Components: ", components
 
-    for x,y in enumerate(transitions) :
-        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+    #for x,y in enumerate(transitions) :
+    #    print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
 
 def SDSExample() :
