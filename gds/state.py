@@ -159,3 +159,50 @@ class StatePerBiT :
 
     def __ne__(self, other) :
         return self.x != other.x or self.kup != other.kup or self.kdown != other.kdown
+
+class StateEnumPerBiT :
+    """ """
+
+    def __init__(self, x = 0, kup = 2, kdown = 1, degree = 2, index = 0) :
+        self.x = x
+        self.kup = kup
+        self.kdown = kdown
+        self.degree = degree
+        self.num = 6
+        self.index = index
+
+    def __repr__(self) :
+        return "(%i, %i, %i)" % (self.x, self.kup, self.kdown)
+
+    def Num(self) :
+        return self.num
+
+    def StateToIndex(self, s ) :
+        return s.index
+
+    def IndexToState(self, i) :
+        if i == 0 :
+            return StateEnumPerBiT(0, 2, 1, self.degree, i)
+        elif i == 1 :
+            return StateEnumPerBiT(0, 3, 1, self.degree, i)
+        elif i == 2 :
+            return StateEnumPerBiT(0, 2, 1, self.degree, i)
+        elif i == 3 :
+            return StateEnumPerBiT(0, 2, 2, self.degree, i)
+        elif i == 4 :
+            return StateEnumPerBiT(1, 2, 1, self.degree, i)
+        elif i == 5 :
+            return StateEnumPerBiT(1, 3, 1, self.degree, i)
+        elif i == 6 :
+            return StateEnumPerBiT(1, 2, 1, self.degree, i)
+        elif i == 7 :
+            return StateEnumPerBiT(1, 2, 2, self.degree, i)
+
+
+
+    def __eq__(self, other) :
+        return self.x == other.x and self.kup == other.kup and self.kdown == other.kdown and self.index == other.index
+
+    def __ne__(self, other) :
+        return self.x != other.x or self.kup != other.kup or self.kdown != other.kdown or self.index != other.index
+

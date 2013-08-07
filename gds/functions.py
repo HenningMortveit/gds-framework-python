@@ -215,3 +215,28 @@ def perBiThreshold(s, indexList, i) :
     else :
         return s[i]
 
+def enumPerBiThreshold(s, indexList, i) :
+    """ """
+
+    sum = 0
+    for j in indexList :
+        sum += s[j].x
+    
+    if s[i].index == 0 and sum>= s[i].kup :
+        return state.StateEnumPerBiT(1, 3, 1, s[i].degree, 5)
+    elif s[i].index == 1 and sum>= s[i].kup :
+        return state.StateEnumPerBiT(1, 2, 1, s[i].degree, 6)
+    elif s[i].index == 2 and sum>= s[i].kup :
+        return state.StateEnumPerBiT(1, 2, 2, s[i].degree, 7)
+    elif s[i].index == 3 and sum>= s[i].kup :
+        return state.StateEnumPerBiT(1, 2, 1, s[i].degree, 4)
+    elif s[i].index == 4 and sum< s[i].kdown :
+        return state.StateEnumPerBiT(0, 3, 1, s[i].degree, 1)
+    elif s[i].index == 5 and sum< s[i].kdown :
+        return state.StateEnumPerBiT(0, 2, 1, s[i].degree, 2)
+    elif s[i].index == 6 and sum< s[i].kdown :
+        return state.StateEnumPerBiT(0, 2, 2, s[i].degree, 3)
+    elif s[i].index == 7 and sum< s[i].kdown :
+        return state.StateEnumPerBiT(0, 2, 1, s[i].degree, 0)
+    else :
+        return s[i]

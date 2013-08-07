@@ -288,7 +288,7 @@ def PerBiThresholdExample() :
 
     f = n * [gds.functions.perBiThreshold]
 
-    gds1 = gds.gds.GDS(X, f, stateObject, False)
+    gds1 = gds.gds.GDS(X, f, stateObject, True)
 
     #gds1.SetSequence(pi)
     gds1.SetParallel()
@@ -320,6 +320,50 @@ def PerBiThresholdExample() :
 
     #for x,y in enumerate(transitions) :
     #    print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
+def EnumPerBiThresholdExample() :
+
+    n = 4
+    pi = [0,1,2,3]
+
+    X = gds.graphs.CircleGraph(n)
+    stateObject = n * [gds.state.StateEnumPerBiT(0,2,1,2,0)]
+    #stateObject[0] = gds.state.StateDynBiT(0,1,3,n)
+
+    f = n * [gds.functions.enumPerBiThreshold]
+
+    gds1 = gds.gds.GDS(X, f, stateObject, True)
+
+    #gds1.SetSequence(pi)
+    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    #print "Fixed points: %i" % len(fixedPoints)
+    #for i in fixedPoints :
+    #    print i, gds1.IntegerToState(i) 
+
+    print "Periodic points: "
+    file = open("EnumPerBi_Per.txt",'w')
+    for i, cycle in enumerate(periodicPoints) :
+        file.write("%i:\n" %i)
+        for j in cycle :
+            data = repr(gds1.IntegerToState(j))
+            file.write("%s\n" %data)
+    file.close()
+
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
 
 def SDSExample() :
@@ -996,7 +1040,7 @@ def PlotStabilityArray(diagrams, density=True) :
 
 def main() :
 
-    PerBiThresholdExample()
+    EnumPerBiThresholdExample()
     sys.exit(0)
 
     n =10
