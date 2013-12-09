@@ -25,11 +25,43 @@ class EdgeDensity :
         for node in n1 :
             neighbor = self.graph.neighbors(node)
             for n in neighbor :
-                if (n !=node) :
+                if (n !=node and n != iNode) :
                     n2.append(n)
-        self.subgraph = self.graph.subgraph(n1+n2)
-        
-        
+        #Delete the duplicated nodes
+        n2 = list(set(n2))
+
+        subNodes = list()
+        subNodes = (n1+n2)
+        subNodes.append(iNode)
+        self.subgraph = self.graph.subgraph(subNodes)
+
+        #Add type3 edges
+        type3 = self.type3Edge
+        for i in range(0, len(n1)) :
+            for j in range (i+1, len(n1)) :
+                if (type3 > 0 and not self.subgraph.has_edge(n1[i],n1[j])) :
+                    self.subgraph.add_edge(n1[i],n1[j])
+                    type3 = type3 - 1
+                    print "Type 3 edge (%d, %d) added" %(n1[i],n1[j])
+                elif (type3 == 0) :
+                    break
+        if (type3 > 0):
+            print "ERROR: Cannot add that much type3 edges! %d added" %(self.type3Edge - type3)
+     
+        #add type4 edges
+        type4 = self.type4Edge
+        for i in range(0, len(n1)) :
+            for j in range (0, len(n2)) :
+                if (type4 > 0 and not self.subgraph.has_edge(n1[i],n2[j])) :
+                    self.subgraph.add_edge(n1[i],n2[j])
+                    type4 = type4 - 1
+                    print "Type 4 edge (%d, %d) added" %(n1[i],n2[j])
+                elif (type4 == 0) :
+                    break
+        if (type4 > 0):
+            print "ERROR: Cannot add that much type4 edges! %d added" %(self.type4Edge - type4)
+        print self.subgraph.nodes()
+
 
     def SetGDS(self, f) :
         n = len(self.subgraph.nodes())
@@ -37,7 +69,6 @@ class EdgeDensity :
     	stateObject = n * [gds.state.State(0, 2)]
    	self.gds = gds.GDS(self.subgraph, function, stateObject, False)
   
-        
 
     def ComputeActivity(self):
         """Compute alpha_{F,i}"""
@@ -69,8 +100,9 @@ def main() :
     for e in edges :
         X.add_edge(e[0], e[1])
     X.add_edge(9,10)
-    f = gds.functions.threshold(1)
-    D = EdgeDensity(X, f, 0, 0, 0)
+    X.add_edge(10,11)
+    f = gds.functions.threshold(2)
+    D = EdgeDensity(X, f, 0, 2, 0)
     D.ComputeActivity()
     
 
