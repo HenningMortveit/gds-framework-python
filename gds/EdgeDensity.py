@@ -60,7 +60,7 @@ class EdgeDensity :
                     break
         if (type4 > 0):
             print "ERROR: Cannot add that much type4 edges! %d added" %(self.type4Edge - type4)
-        print self.subgraph.nodes()
+        print "Subgraph nodes:", self.subgraph.nodes()
 
 
     def SetGDS(self, f) :
@@ -88,6 +88,9 @@ class EdgeDensity :
     	self.activity = float(self.diff)/(2**self.gds.GetDim())
     	print "different image:", self.diff
     	print self.activity
+ 
+    def GetActivity (self): 
+        return self.activity
 
 def main() :
     X = networkx.Graph()
@@ -101,9 +104,16 @@ def main() :
         X.add_edge(e[0], e[1])
     X.add_edge(9,10)
     X.add_edge(10,11)
-    f = gds.functions.threshold(2)
-    D = EdgeDensity(X, f, 0, 2, 0)
-    D.ComputeActivity()
+    f = gds.functions.threshold(1)
+    
+    type3 = range(4)
+    type4 = range(13)
+    for i in range(0, len(type4)) :
+        for j in range(0, len(type3)) :
+            print "_____________________type 3: %d  type 4: %d___________________________\n" %(type3[j],type4[i])
+            D = EdgeDensity(X, f, 0, type3[j], type4[i])
+            D.ComputeActivity()
+
     
 
 if __name__ == "__main__" :
