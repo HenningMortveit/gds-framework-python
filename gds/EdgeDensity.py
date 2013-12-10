@@ -13,8 +13,9 @@ class EdgeDensity :
         self.activity = 0
      
     def SetSubgraph (self, g, iNode, type3Edge, type4Edge) :
-	"""Form the subgraph associated with node i and its distance-1 and distance-2 neighbors.
-       Generate the possible type3 and type4 edge list.        
+	"""1. Form the subgraph associated with node i and its distance-1 and distance-2 neighbors.
+       2. Generate the possible type3 and type4 edge list. 
+       3. Randomly add edges into the subgraph from the list.        
     """
         self.graph = g
         self.iNode = iNode
@@ -48,8 +49,9 @@ class EdgeDensity :
             for j in range(0, len(n2)) :
                 if (not self.subgraph.has_edge(n1[i],n2[j])) :
                     self.type4EdgeList.append([n1[i],n2[j]])
-        print self.type3EdgeList
-        print self.type4EdgeList
+        
+        #---------------------------------------------------------------
+        #Randomly add edges into the subgraph, using Reservoir Sampling Algorithm.
 
 
         #Add type3 edges
@@ -84,7 +86,7 @@ class EdgeDensity :
         n = len(self.subgraph.nodes())
         function = n * [f]
     	stateObject = n * [gds.state.State(0, 2)]
-   	self.gds = gds.GDS(self.subgraph, function, stateObject, False)
+    	self.gds = gds.GDS(self.subgraph, function, stateObject, False)
   
 
     def ComputeActivity(self):
@@ -103,8 +105,8 @@ class EdgeDensity :
         	if (y != iFlipImageIndex) :
             		self.diff = self.diff + 1
     	self.activity = float(self.diff)/(2**self.gds.GetDim())
-    	#print "different image:", self.diff
-    	#print self.activity
+    	print "different image:", self.diff
+    	print self.activity
  
     def GetActivity (self): 
         return self.activity
@@ -137,8 +139,8 @@ def main() :
     #        s = s + "%d\t" %D.GetDiff()
     #    print s 
 
-    #D = EdgeDensity(X, f, 0, 3, 12)
-    #D.ComputeActivity()
+    D = EdgeDensity(X, f, 0, 3, 12)
+    D.ComputeActivity()
     
 if __name__ == "__main__" :
     main()
