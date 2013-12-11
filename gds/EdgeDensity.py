@@ -1,9 +1,11 @@
 import os
+import sys
 import math
 import gds
 import algorithms
 import graphs
 import networkx
+import random
 
 class EdgeDensity :
     def  __init__(self, g, f, iNode, type3Edge, type4Edge):
@@ -15,7 +17,11 @@ class EdgeDensity :
     def SetSubgraph (self, g, iNode, type3Edge, type4Edge) :
 	"""1. Form the subgraph associated with node i and its distance-1 and distance-2 neighbors.
        2. Generate the possible type3 and type4 edge list. 
-       3. Randomly add edges into the subgraph from the list.        
+       3. Randomly add edges into the subgraph from the list.
+       Naming:
+       type3Edge: the number of type3 edges to add
+       type3EdgeList: the list of possible type3 edges that can be added
+       edge3: the list of type3 edges that are selected from type3EdgeList to add.
     """
         self.graph = g
         self.iNode = iNode
@@ -52,7 +58,34 @@ class EdgeDensity :
         
         #---------------------------------------------------------------
         #Randomly add edges into the subgraph, using Reservoir Sampling Algorithm.
+        self.edge3 = list()
+        self.edge4 = list()
+        if (self.type3Edge > len(self.type3EdgeList)) :
+            print "ERROR: Exceed the type3 edges upper bound %d!" %len(self.type3EdgeList)
+            sys.exit(0)
+        if (self.type4Edge > len(self.type4EdgeList)) :
+            print "ERROR: Exceed the type4 edges upper bound %d!" %len(self.type4EdgeList)
+            sys.exit(0)
+        if (self.type3Edge != 0) :
+            for i in range(0, self.type3Edge) :
+                self.edge3.append(self.type3EdgeList[i])
+            for i in range(self.type3Edge - 1, len(self.type3EdgeList)) :
+                j = random.randint(0, i)
+                if (j < self.type3Edge):
+                    self.edge3[j] = self.type3EdgeList[i]
 
+        if (self.type4Edge != 0) :
+            for i in range(0, self.type4Edge) :
+                self.edge4.append(self.type4EdgeList[i])
+            for i in range(self.type4Edge - 1, len(self.type4EdgeList)) :
+                j = random.randint(0, i)
+                if (j < self.type4Edge):
+                    self.edge4[j] = self.type4EdgeList[i]
+
+        for e in self.edge3 :
+            self.subgraph.add_edge(e[0], e[1])
+        for e in self.edge4 :
+            self.subgraph.add_edge(e[0], e[1])
 
         #Add type3 edges
         #type3 = self.type3Edge
@@ -105,8 +138,8 @@ class EdgeDensity :
         	if (y != iFlipImageIndex) :
             		self.diff = self.diff + 1
     	self.activity = float(self.diff)/(2**self.gds.GetDim())
-    	print "different image:", self.diff
-    	print self.activity
+    	#print "different image:", self.diff
+    	#print self.activity
  
     def GetActivity (self): 
         return self.activity
@@ -128,19 +161,23 @@ def main() :
     X.add_edge(10,11)
     f = gds.functions.threshold(4)
     
-    #type3 = range(4)
-    #type4 = range(13)
-    #print "#T4\T3 \t 0 \t 1 \t 2 \t 3"
-    #for i in range(0, len(type4)) :
-    #    s = "%d \t" %i
-    #    for j in range(0, len(type3)) :
-    #        D = EdgeDensity(X, f, 0, type3[j], type4[i])
-    #        D.ComputeActivity()
-    #        s = s + "%d\t" %D.GetDiff()
-    #    print s 
+    sampleSize = 5 #compute activity several times and take average
+    type3 = range(4)
+    type4 = range(13)
+    print "#T4\T3 \t 0 \t 1 \t 2 \t 3"
+    for i in range(0, len(type4)) :
+        s = "%d \t" %i
+        for j in range(0, len(type3)) :
+            sumActivity = 0
+            for k in range(0, sampleSize) :
+                D = EdgeDensity(X, f, 0, type3[j], type4[i])
+                D.ComputeActivity()
+                sumActivity = sumActivity + D.GetActivity()
+            s = s + "%f\t" %(sumActivity/sampleSize)
+        print s 
 
-    D = EdgeDensity(X, f, 0, 3, 12)
-    D.ComputeActivity()
+    #D = EdgeDensity(X, f, 0, 2, 3)
+    #D.ComputeActivity()
     
 if __name__ == "__main__" :
     main()
