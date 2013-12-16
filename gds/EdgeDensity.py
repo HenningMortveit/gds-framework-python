@@ -6,6 +6,7 @@ import algorithms
 import graphs
 import networkx
 import random
+import numpy
 
 class EdgeDensity :
     def  __init__(self, g, f, iNode, type3Edge, type4Edge):
@@ -69,7 +70,7 @@ class EdgeDensity :
         if (self.type3Edge != 0) :
             for i in range(0, self.type3Edge) :
                 self.edge3.append(self.type3EdgeList[i])
-            for i in range(self.type3Edge - 1, len(self.type3EdgeList)) :
+            for i in range(self.type3Edge, len(self.type3EdgeList)) :
                 j = random.randint(0, i)
                 if (j < self.type3Edge):
                     self.edge3[j] = self.type3EdgeList[i]
@@ -77,11 +78,11 @@ class EdgeDensity :
         if (self.type4Edge != 0) :
             for i in range(0, self.type4Edge) :
                 self.edge4.append(self.type4EdgeList[i])
-            for i in range(self.type4Edge - 1, len(self.type4EdgeList)) :
+            for i in range(self.type4Edge, len(self.type4EdgeList)) :
                 j = random.randint(0, i)
                 if (j < self.type4Edge):
                     self.edge4[j] = self.type4EdgeList[i]
-
+        
         for e in self.edge3 :
             self.subgraph.add_edge(e[0], e[1])
         for e in self.edge4 :
@@ -159,7 +160,17 @@ def main() :
         X.add_edge(e[0], e[1])
     X.add_edge(9,10)
     X.add_edge(10,11)
-    f = gds.functions.threshold(4)
+    #edges = [
+    #    [0,1],[0,2],[0,3],[0,4],
+    #    [1,5],[1,6],[1,7],
+    #    [2,8],[2,9],[2,10],
+    #    [3,11],[3,12],[3,13],
+    #    [4,14],[4,15],[4,16]
+    #        ]
+    #for e in edges :
+    #    X.add_edge(e[0], e[1])
+    #X.add_edge(16,17)
+    f = gds.functions.threshold(3)
     
     sampleSize = 5 #compute activity several times and take average
     type3 = range(4)
@@ -169,15 +180,19 @@ def main() :
         s = "%d \t" %i
         for j in range(0, len(type3)) :
             sumActivity = 0
+            activityList = list()
             for k in range(0, sampleSize) :
                 D = EdgeDensity(X, f, 0, type3[j], type4[i])
                 D.ComputeActivity()
+                #activityList.append(D.GetActivity())
                 sumActivity = sumActivity + D.GetActivity()
             s = s + "%f\t" %(sumActivity/sampleSize)
+            #s = s + "%f\t" %(numpy.std(activityList, axis = 0))
         print s 
 
-    #D = EdgeDensity(X, f, 0, 2, 3)
+    #D = EdgeDensity(X, f, 0, 3, 5)
     #D.ComputeActivity()
+    #print D.GetActivity()
     
 if __name__ == "__main__" :
     main()
