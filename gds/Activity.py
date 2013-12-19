@@ -24,11 +24,11 @@ class Activity :
     def __init__(self, g, f, iNode) :
         self.graph = g
         self.iNode = iNode
-	self.func = f
+        self.func = f
         self.SetSubgraph()
-        self.SetGDS(f)
+        self.SetGDS()
         self.activity = 0
-	self.diff = 0
+        self.diff = 0
 
     def SetSubgraph(self) :
 	"""Extract the distance-2 subgraph X(i;2)"""
@@ -37,7 +37,7 @@ class Activity :
         for node in self.n1 :
             neighbor = self.graph.neighbors(node)
             for n in neighbor :
-                if (n !=node and n != self.iNode) :
+                if (not self.graph.has_edge(n, self.iNode) and n != self.iNode) :
                     self.n2.append(n)
         #Delete the duplicated nodes
         self.n2 = list(set(self.n2))
@@ -46,6 +46,9 @@ class Activity :
         self.subNodes = (self.n1+self.n2)
         self.subNodes.append(self.iNode)
         self.subgraph = self.graph.subgraph(self.subNodes)
+        print "n1:", self.n1
+        print "n2:", self.n2
+        #print self.subgraph.edge
 
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
@@ -79,18 +82,78 @@ class Activity :
     def GetDiff (self) :
         return self.diff
 
+    def GetD1(self) :
+        """Get the degree of node i"""
+        self.d1 = len(self.n1)
+        return self.d1
+
+    def GetD2(self) :
+        """Get the number of distance-2 nodes of node i"""
+        self.d2 = len(self.n2)
+        return self.d2 
+
+    def GetT3(self) :
+        """Get type 3 edge number"""
+        self.t3 = 0
+        for i in range(0, len(self.n1)-1) :
+            for j in range(i+1, len(self.n1)) :
+                if (self.subgraph.has_edge(self.n1[i],self.n1[j])) :
+                    self.t3 = self.t3 + 1
+        return self.t3
+
+    def GetT4(self) :
+        self.t4 = 0
+        for i in range(0, len(self.n1)) :
+            for j in range(0, len(self.n2)):
+                if (self.subgraph.has_edge(self.n1[i],self.n2[j])) :
+                    self.t4 = self.t4 + 1
+        #Exclude the original edges
+        self.t4 = self.t4 - self.d2
+        return self.t4
+
+    def GetChromaticNumber(self) :
+        "Compute the chromatic number of X(i;2)"
+        ncolor = 1
+        while(True) :
+            if (self.CanColor(ncolor)) :
+                self.chromaticNumber = ncolor
+                return self.chromaticNumber
+            else :
+                ncolor = ncolor + 1
+
+    def CanColor(self,ncolor) :
+        #colorMap<v,c>, where v is the vertex, c is the color assigned to it.
+        colorMap = {}
+        for node in self.subNodes :
+            colorMap[node] = 0
+        for node in self.subNodes :
+            colorAvail = range(1, ncolor + 1)
+            for neighbor in self.subgraph.neighbors(node) :
+                if (colorMap[neighbor] != 0 and colorMap[neighbor] in colorAvail) :
+                    colorAvail.remove(colorMap[neighbor])
+            if (len(colorAvail) != 0) :
+                colorMap[node] = colorAvail[0]
+            else :
+                return False
+        return True
+
+    
 def main() :
     X = networkx.Graph()
-    edges = [
-         [0,1],[0,2],[0,3],
-         [1,4],[1,5],
-         [2,6],[2,7],
-         [3,8],[3,9]
-         ]
-    for e in edges :
-        X.add_edge(e[0], e[1])
-    X.add_edge(9,10)
-    X.add_edge(10,11)
+    #edges = [
+    #     [0,1],[0,2],[0,3],
+    #     [1,4],[1,5],
+    #     [2,6],[2,7],
+    #     [3,8],[3,9]
+    #     ]
+    #for e in edges :
+    #    X.add_edge(e[0], e[1])
+    #X.add_edge(1,3)
+    #X.add_edge(1,6)
+    #X.add_edge(3,7)
+    #X.add_edge(6,7)
+    #X.add_edge(9,10)
+    #X.add_edge(10,11)
     #edges = [
     #    [0,1],[0,2],[0,3],[0,4],
     #    [1,5],[1,6],[1,7],
@@ -101,29 +164,16 @@ def main() :
     #for e in edges :
     #    X.add_edge(e[0], e[1])
     #X.add_edge(16,17)
-    f = gds.functions.threshold(3)
-    
-    sampleSize = 5 #compute activity several times and take average
-    type3 = range(4)
-    type4 = range(13)
-    print "#T4\T3 \t 0 \t 1 \t 2 \t 3"
-    for i in range(0, len(type4)) :
-        s = "%d \t" %i
-        for j in range(0, len(type3)) :
-            sumActivity = 0
-            activityList = list()
-            for k in range(0, sampleSize) :
-                D = EdgeDensity(X, f, 0, type3[j], type4[i])
-                D.ComputeActivity()
-                #activityList.append(D.GetActivity())
-                sumActivity = sumActivity + D.GetActivity()
-            s = s + "%f\t" %(sumActivity/sampleSize)
-            #s = s + "%f\t" %(numpy.std(activityList, axis = 0))
-        print s 
+    X.add_edge(0,1)
+    X.add_edge(1,2)
+    X.add_edge(2,3)
+    X.add_edge(3,0)
+    #X.add_edge(1,3)
+    f = gds.functions.threshold(1)
 
-    #D = EdgeDensity(X, f, 0, 3, 5)
-    #D.ComputeActivity()
-    #print D.GetActivity()
+    A = Activity(X, f, 0)
+    A.ComputeActivity()
+    print "Chromatic number:",A.GetChromaticNumber()
     
 if __name__ == "__main__" :
     main()
