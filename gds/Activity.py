@@ -12,6 +12,13 @@
 # 7. chromatic number of X(i;2): \chi(i) 
 ################################################################################
 
+### ----------------------------------------------------------------------------
+### Modification history
+### Dec. 27 2013
+### Fix the subgraph label problem, subgraph nodes now have their own label
+### following 0,1,2...
+### ----------------------------------------------------------------------------
+
 import os
 import sys
 import math
@@ -19,6 +26,7 @@ import gds
 import algorithms
 import graphs
 import networkx
+import matplotlib.pyplot as plt
 
 class Activity :
     def __init__(self, g, f, iNode) :
@@ -44,11 +52,21 @@ class Activity :
 
         self.subNodes = list()
         self.subNodes = (self.n1+self.n2)
-        self.subNodes.append(self.iNode)
+        self.subNodes.insert(0,self.iNode)
         self.subgraph = self.graph.subgraph(self.subNodes)
-        print "n1:", self.n1
-        print "n2:", self.n2
-        #print self.subgraph.edge
+
+        #relabel the subgraph nodes, follow the consecutive order: 0, 1, 2.....
+        #subNodes keep the label from the orginal graph, subgraph has its own label.
+        labelMap = {}
+        l = 0
+        for node in self.subNodes :
+            labelMap[node] = l
+            l = l + 1
+        networkx.relabel_nodes(self.subgraph,labelMap,False)
+        self.iNode = 0
+    
+        print self.subgraph.nodes()
+        print self.subNodes
 
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
@@ -113,6 +131,7 @@ class Activity :
 
     def GetChromaticNumber(self) :
         "Compute the chromatic number of X(i;2)"
+        #Based on greedy algorithm, can be arbitrary bad due to the ordering of the vertices.
         ncolor = 1
         while(True) :
             if (self.CanColor(ncolor)) :
@@ -124,9 +143,9 @@ class Activity :
     def CanColor(self,ncolor) :
         #colorMap<v,c>, where v is the vertex, c is the color assigned to it.
         colorMap = {}
-        for node in self.subNodes :
+        for node in self.subgraph.nodes() :
             colorMap[node] = 0
-        for node in self.subNodes :
+        for node in self.subgraph.nodes() :
             colorAvail = range(1, ncolor + 1)
             for neighbor in self.subgraph.neighbors(node) :
                 if (colorMap[neighbor] != 0 and colorMap[neighbor] in colorAvail) :
@@ -164,11 +183,15 @@ def main() :
     #for e in edges :
     #    X.add_edge(e[0], e[1])
     #X.add_edge(16,17)
-    X.add_edge(0,1)
-    X.add_edge(1,2)
-    X.add_edge(2,3)
-    X.add_edge(3,0)
+    #X.add_edge(0,3)
+    #X.add_edge(3,1)
+    #X.add_edge(1,2)
+    #X.add_edge(3,0)
     #X.add_edge(1,3)
+    X = networkx.gnp_random_graph(10, 0.1)
+    networkx.draw(X)
+    plt.savefig("X.png")
+
     f = gds.functions.threshold(1)
 
     A = Activity(X, f, 0)
