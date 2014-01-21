@@ -9,7 +9,8 @@
 # 4. number of type-3 edges: t3(i)
 # 5. number of type-4 edges: t4(i)
 # 6. distance-2 subgraph of node i: X(i;2)
-# 7. chromatic number of X(i;2): \chi(i) 
+# 7. chromatic number of X(i;2): \chi(i)
+# 8. number of acyclic orientations
 ################################################################################
 
 ### ----------------------------------------------------------------------------
@@ -17,6 +18,9 @@
 ### Dec. 27 2013
 ### Fix the subgraph label problem, subgraph nodes now have their own label
 ### following 0,1,2...
+
+### Jan. 09 2014
+### Add the module to compute the number of acyclic orientations
 ### ----------------------------------------------------------------------------
 
 import os
@@ -26,6 +30,7 @@ import gds
 import algorithms
 import graphs
 import networkx
+import equivalence
 import matplotlib.pyplot as plt
 
 class Activity :
@@ -158,30 +163,37 @@ class Activity :
                 return False
         return True
 
+    def GetAcyclicOrientationsNumber(self) :
+        acyc, le = equivalence.AcyclicOrientations(self.sg)
+	self.acycNumber = len(acyc)
+        return self.acycNumber
     
 def main() :
+    #X = networkx.gnp_random_graph(20,0.2)
+    #f = gds.functions.threshold(3)
+    #A = Activity(X, f, 0)
+    #print A.GetAcylicOrientationsNumber()
+    #sys.exit(0)
+	
     #-----------------------------------
-    X = networkx.gnp_random_graph(20, 0.2)
-    networkx.draw(X)
-    plt.savefig("./graphs/gnp-20-0.3.png")
-    plt.clf()
-    result = open("Activity-gnp-20-0.3.csv", 'w')
-    result.write("#node_i \t activity \t d(i) \t d2(i) \t t3(i) \t t4(i) \t \chi(i) \n")
-    for node in X.nodes() :
-        f = gds.functions.threshold(3)
-        A = Activity(X, f, node)
-        A.ComputeActivity()
-        print A.GetT4()
-        result.write("%d \t %f \t %d \t %d \t %d \t %d \t %d \n"%(node, A.GetActivity(), A.GetD1(), A.GetD2(), A.GetT3(), A.GetT4(), A.GetChromaticNumber()))
-	networkx.draw(A.GetSubgraph())
-	plt.savefig("./graphs/subgraph-%d" %node)
-	plt.clf()
-    result.close()
+    #X = networkx.gnp_random_graph(20, 0.2)
+    #networkx.draw(X)
+    #plt.savefig("./graphs/gnp-20-0.3.png")
+    #plt.clf()
+    #result = open("Activity-gnp-20-0.3.csv", 'w')
+    #result.write("#node_i \t activity \t d(i) \t d2(i) \t t3(i) \t t4(i) \t \chi(i) \n")
+    #for node in X.nodes() :
+    #    f = gds.functions.threshold(3)
+    #    A = Activity(X, f, node)
+    #    A.ComputeActivity()
+    #    print A.GetT4()
+    #    result.write("%d \t %f \t %d \t %d \t %d \t %d \t %d \n"%(node, A.GetActivity(), A.GetD1(), A.GetD2(), A.GetT3(), A.GetT4(), A.GetChromaticNumber()))
+	#networkx.draw(A.GetSubgraph())
+	#plt.savefig("./graphs/subgraph-%d" %node)
+	#plt.clf()
+    #result.close()
 
-
-
-
-    sys.exit(0)
+    #sys.exit(0)
 
     #----------------------------------
     X = networkx.Graph()
@@ -193,7 +205,7 @@ def main() :
          ]
     for e in edges :
         X.add_edge(e[0], e[1])
-    X.add_edge(1,3)
+    #X.add_edge(1,3)
     #X.add_edge(1,6)
     #X.add_edge(3,7)
     #X.add_edge(6,7)
@@ -217,14 +229,15 @@ def main() :
     #X = networkx.gnp_random_graph(10, 0.25)
     #X.add_node(0)
     #networkx.draw(X)
-    plt.savefig("X.png")
+    #plt.savefig("X.png")
 
-    f = gds.functions.threshold(1)
+    f = gds.functions.threshold(2)
 
     A = Activity(X, f, 0)
     A.ComputeActivity()
     print "Chromatic number:",A.GetChromaticNumber()
     print "Diff:", A.GetDiff()
+    print "Activity:", A.GetActivity()
     
 if __name__ == "__main__" :
     main()
