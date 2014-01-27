@@ -38,7 +38,10 @@ class Activity :
         self.graph = g
         self.iNode = iNode
         self.func = f
-        self.SetSubgraph()
+        if networkx.is_directed(g) :
+            self.SetDiSubgraph()
+        else :
+            self.SetSubgraph()
         self.SetGDS()
         self.activity = 0
         self.diff = 0
@@ -73,6 +76,10 @@ class Activity :
     
         print self.sg.nodes()
         print self.subNodes
+
+    def SetDiSubgraph(self) :
+        """Directed graph version of Setsubgraph"""
+        self.sg = self.graph
 
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
@@ -169,6 +176,27 @@ class Activity :
         return self.acycNumber
     
 def main() :
+    X = networkx.DiGraph()
+    edges = [
+            [0,1],[1,2],[2,0]
+    ]
+    for e in edges :
+        X.add_edge(e[0],e[1])
+
+    X.add_edge(0,0)
+    f = gds.functions.threshold(2)
+
+    A = Activity(X, f, 0)
+    A.ComputeActivity()
+    print "Chromatic number:",A.GetChromaticNumber()
+    print "Diff:", A.GetDiff()
+    print "Activity:", A.GetActivity()
+
+    networkx.draw(X, pos = networkx.spring_layout(X))
+    plt.show()
+
+    sys.exit(0)
+
     #X = networkx.gnp_random_graph(20,0.2)
     #f = gds.functions.threshold(3)
     #A = Activity(X, f, 0)
