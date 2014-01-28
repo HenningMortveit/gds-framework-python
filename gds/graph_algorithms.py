@@ -1,4 +1,3 @@
-#
 # Algorithms on graphs.
 #
 
@@ -10,11 +9,17 @@ def CreateIndexMap(g) :
 
     n = len(g.nodes())
     iMap = []
-    for i in range(0,n) :
-        n1 = g.neighbors(i)
-        #SW: It is assumed that a undirected graph has implicit self loop, whereas a directed graph does not have unless the loop is explicit.
-        if not networkx.is_directed(g) :
+    #SW: It is assumed that a undirected graph has implicit self loop, whereas a directed graph does not have unless the loop is explicit.
+    if not networkx.is_directed(g) :
+        for i in range(0,n) :
+	    n1 = g.neighbors(i)
             n1.append(i)
-        n1.sort()
-        iMap.append( n1 )
+            n1.sort()
+            iMap.append( n1 )
+    else :
+    	for i in range(0,n) :
+	    n1 = g.predecessors(i)
+            n1.sort()
+            iMap.append( n1 )
+    print iMap
     return iMap

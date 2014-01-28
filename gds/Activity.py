@@ -21,6 +21,9 @@
 
 ### Jan. 09 2014
 ### Add the module to compute the number of acyclic orientations
+
+### Jan. 27 2014
+### Make changes to accomodate directed graphs
 ### ----------------------------------------------------------------------------
 
 import os
@@ -78,7 +81,7 @@ class Activity :
         print self.subNodes
 
     def SetDiSubgraph(self) :
-        """Directed graph version of Setsubgraph"""
+        """Directed version of Setsubgraph"""
         self.sg = self.graph
 
     def SetGDS(self) :
@@ -91,7 +94,6 @@ class Activity :
     def ComputeActivity(self):
         """Compute alpha_{F,i}"""
      	transitions = algorithms.GenerateTransitions(self.gds)
-
     	for x,y in enumerate(transitions) :
         	state = self.gds.IntegerToState(x)
         	iFlipState = state
@@ -104,8 +106,6 @@ class Activity :
         	if (y != iFlipImageIndex) :
             		self.diff = self.diff + 1
     	self.activity = float(self.diff)/(2**self.gds.GetDim())
-    	#print "different image:", self.diff
-    	#print self.activity
 
     def GetSubgraph (self) :
         return self.subgraph
@@ -192,8 +192,8 @@ def main() :
     print "Diff:", A.GetDiff()
     print "Activity:", A.GetActivity()
 
-    networkx.draw(X, pos = networkx.spring_layout(X))
-    plt.show()
+    #networkx.draw(X, pos = networkx.spring_layout(X))
+    #plt.show()
 
     sys.exit(0)
 
@@ -224,9 +224,9 @@ def main() :
     #sys.exit(0)
 
     #----------------------------------
-    X = networkx.Graph()
+    X = networkx.DiGraph()
     edges = [
-         [0,1],[0,2],[0,3],
+         [1,0],[2,0],[3,0],
          [1,4],[1,5],
          [2,6],[2,7],
          [3,8],[3,9]
@@ -256,10 +256,10 @@ def main() :
     #X.add_edge(1,3)
     #X = networkx.gnp_random_graph(10, 0.25)
     #X.add_node(0)
-    #networkx.draw(X)
-    #plt.savefig("X.png")
+    networkx.draw(X,pos=networkx.spring_layout(X))
+    plt.show()
 
-    f = gds.functions.threshold(2)
+    f = gds.functions.threshold(1)
 
     A = Activity(X, f, 0)
     A.ComputeActivity()
