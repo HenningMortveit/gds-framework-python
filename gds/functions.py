@@ -59,7 +59,7 @@ class threshold :
         sum = 0
         for j in indexList :
             sum += s[j].x
-        return state.State( 0 if sum < self.k else 1, 2)
+        return state.State( 0 if sum < self.k else 1, 2) 
 
 class biThreshold :
     """Binary bi-threshold rule."""

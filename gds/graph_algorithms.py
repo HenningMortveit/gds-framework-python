@@ -21,5 +21,4 @@ def CreateIndexMap(g) :
 	    n1 = g.predecessors(i)
             n1.sort()
             iMap.append( n1 )
-    print iMap
     return iMap
