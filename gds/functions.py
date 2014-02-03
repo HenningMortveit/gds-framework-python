@@ -10,7 +10,7 @@ import state
 
 # ------------------------------------------------------------
 
-def parity(s, indexList, i) :
+def parity(g, s, indexList, i) :
     """Boolean parity function (sum modulo 2)"""
 
     sum = 0
@@ -18,7 +18,7 @@ def parity(s, indexList, i) :
         sum += s[k].x
     return state.State(sum % 2, 2)
 
-def majority(s, indexList, i) :
+def majority(g, s, indexList, i) :
     """Boolean parity function (sum modulo 2)"""
 
     sum = 0
@@ -31,7 +31,7 @@ def majority(s, indexList, i) :
         return state.State(0, 2)
 
 
-def nor(s, indexList, i) :
+def nor(g, s, indexList, i) :
     """Boolean nor function"""
 
     sum = 0
@@ -39,7 +39,7 @@ def nor(s, indexList, i) :
         sum += s[k].x
     return state.State(1 if sum == 0 else 0, 2)
 
-def nand(s, indexList, i) :
+def nand(g, s, indexList, i) :
     """Boolean nand function"""
 
     sum = 0
@@ -55,10 +55,15 @@ class threshold :
     def __init__(self, k ) :
         self.k = k
 
-    def __call__(self, s, indexList, i) :
+    def __call__(self, g, s, indexList, i) :
         sum = 0
         for j in indexList :
-            sum += s[j].x
+            if j == i : #if g is undirected, there is implicit loop for node i
+	        sum += s[j].x 		
+            elif g[j][i] : 
+	        sum += s[j].x*g[j][i]['weight']
+	    else : 
+            	sum += s[j].x
         return state.State( 0 if sum < self.k else 1, 2) 
 
 class biThreshold :
@@ -68,7 +73,7 @@ class biThreshold :
         self.kup = kup
         self.kdown = kdown
 
-    def __call__(self, s, indexList, i) :
+    def __call__(self, g, s, indexList, i) :
         sum = 0
         for j in indexList :
             sum += s[j].x
@@ -87,7 +92,7 @@ class inverseThreshold :
     def __init__(self, k ) :
         self.k = k
 
-    def __call__(self, s, indexList, i) :
+    def __call__(self, g, s, indexList, i) :
         sum = 0
         for j in indexList :
             sum += s[j].x
@@ -102,7 +107,7 @@ class dynBiThreshold :
         self.D01down = D01down
         self.D10down = D10down
 
-    def __call__(self, s, indexList, i) :
+    def __call__(self, g, s, indexList, i) :
         sum = 0
         for j in indexList :
             sum += s[j].x
@@ -138,7 +143,7 @@ class wolfram :
         for i in range(0, 8) :
             self.ruleTable.append( 1 if self.ruleNumber & (1<<i) > 0 else 0 )
 
-    def __call__(self, s, indexList, i) :
+    def __call__(self, g, s, indexList, i) :
         idx = s[indexList[0]].x * 4 \
             + s[indexList[1]].x * 2 \
             + s[indexList[2]].x * 1
@@ -147,7 +152,7 @@ class wolfram :
 
 # Dynamic threshold functions:
 
-def f_up(s, indexList, i) :
+def f_up(g, s, indexList, i) :
     """Increasing threshold function."""
 
     sum = 0
@@ -163,7 +168,7 @@ def f_up(s, indexList, i) :
     return state.StateDynT(x, k, s[i].degree)
 
 
-def f_down(s, indexList, i) :
+def f_down(g, s, indexList, i) :
     """Decreasing threshold function."""
 
     sum = 0
@@ -179,7 +184,7 @@ def f_down(s, indexList, i) :
     return state.StateDynT(x, k, s[i].degree)
 
 
-def f_up_down(s, indexList, i) :
+def f_up_down(g, s, indexList, i) :
     """Mixed threshold function."""
 
     sum = 0
@@ -197,7 +202,7 @@ def f_up_down(s, indexList, i) :
 
     return state.StateDynT(x, k, s[i].degree)
 
-def perBiThreshold(s, indexList, i) :
+def perBiThreshold(g, s, indexList, i) :
     """"""
 
     sum = 0
@@ -215,7 +220,7 @@ def perBiThreshold(s, indexList, i) :
     else :
         return s[i]
 
-def enumPerBiThreshold(s, indexList, i) :
+def enumPerBiThreshold(g, s, indexList, i) :
     """ """
 
     sum = 0

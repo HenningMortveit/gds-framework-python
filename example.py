@@ -365,6 +365,47 @@ def EnumPerBiThresholdExample() :
     for x,y in enumerate(transitions) :
         print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
+def generalizedThresholdExample() :
+    n = 3
+    X = networkx.DiGraph()
+    doCircle = False
+    edges = [
+            [0,1],[1,2],[2,0]
+    ]
+    for e in edges :
+        X.add_edge(e[0],e[1])
+    X[0][1]['weight'] = 0.5
+    X[1][2]['weight'] = 0.5
+    X[2][0]['weight'] = 0	
+
+    f = n * [gds.functions.threshold(1)]
+    stateObject = n * [gds.state.State(0, 2)]
+    gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
+    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: "
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
 def SDSExample() :
     """Basic example for phase space on X = Circle_4."""
@@ -1035,12 +1076,11 @@ def PlotStabilityArray(diagrams, density=True) :
     pdf_pages.savefig(fig, bbox_inches='tight')
     pdf_pages.close()
     plt.show()
-
-
+    
 
 def main() :
 
-    EnumPerBiThresholdExample()
+    generalizedThresholdExample()
     sys.exit(0)
 
     n =10

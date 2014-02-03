@@ -89,21 +89,21 @@ class GDS :
             if( len(block) > 1 ) :
                 y = copy.deepcopy(x)
                 for i in block :
-                    x[i] = self.f[i](y, self.iMap[i], i)
+                    x[i] = self.f[i](self.g, y, self.iMap[i], i)
             else :
                 i = block[0]
-                x[i] = self.f[i](x, self.iMap[i], i)
+                x[i] = self.f[i](self.g, x, self.iMap[i], i)
         return x
 
     def EvaluateParallel(self, x) :
         y = []
         for i in range(0, self.dim) :
-            y.append( self.f[i](x, self.iMap[i], i) )
+            y.append( self.f[i](self.g, x, self.iMap[i], i) )
         return y
 
     def EvaluateSequential(self, x) :
         for i in self.sequence :
-            x[i] = self.f[i](x, self.iMap[i], i)
+            x[i] = self.f[i](self.g, x, self.iMap[i], i)
         return x
 
     def GetDim(self) :
