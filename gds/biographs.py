@@ -67,13 +67,13 @@ class MendozaAlvarezBuylla() :
     def GetFunctionList(self) :
 	return self.f
 	
-    def GetBibtex() :
+    def GetBibtex(self) :
 	return self.bibtex
 	
-    def GetName() :
+    def GetName(self) :
 	return self.name
     
-    def GetDomain() :
+    def GetDomain(self) :
 	return self.domain
 	
 
