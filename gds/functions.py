@@ -58,13 +58,8 @@ class threshold :
     def __call__(self, g, s, indexList, i) :
         sum = 0
         for j in indexList :
-            if j == i : #if g is undirected, there is implicit loop for node i
-	        sum += s[j].x 		
-            elif g[j][i] : 
-	        sum += s[j].x*g[j][i]['weight']
-	    else : 
-            	sum += s[j].x
-        return state.State( 0 if sum < self.k else 1, 2) 
+            sum += s[j].x
+        return state.State( 0 if sum <= self.k else 1, 2) 
 
 class biThreshold :
     """Binary bi-threshold rule."""

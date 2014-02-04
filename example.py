@@ -14,6 +14,7 @@ import gds.equivalence
 import gds.orientation
 import gds.groups
 import gds.sequence
+import gds.biographs
 
 useTeX=True
 
@@ -406,6 +407,34 @@ def generalizedThresholdExample() :
 
     for x,y in enumerate(transitions) :
         print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+
+def biographExample() :
+    M = gds.biographs.MendozaAlvarezBuylla()
+    X = M.GetGraph()
+    doCircle = False
+    f = M.GetFunctionList()
+    stateObject = 12 * [gds.state.State(0, 2)]
+    gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
+    gds1.SetParallel()
+
+    transitions = gds.algorithms.GenerateTransitions(gds1)
+    fixedPoints = gds.algorithms.FixedPoints(gds1, transitions)
+
+    p = gds.phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: "
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
 
 def SDSExample() :
     """Basic example for phase space on X = Circle_4."""
@@ -1079,9 +1108,13 @@ def PlotStabilityArray(diagrams, density=True) :
     
 
 def main() :
+    biographExample()
+    sys.exit(0)
+#---------------------------------------------
 
     generalizedThresholdExample()
     sys.exit(0)
+#---------------------------------------------
 
     n =10
     r = 2
