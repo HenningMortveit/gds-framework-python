@@ -1,7 +1,7 @@
 ################################################################################
 # Feb. 4 2014
 # This module stores a set of biology networks. A network object has a graph, 
-# a list of functions, and some specific information such as bibtex reference,
+# a list of functions, and information such as bibtex reference,
 # name, domain("biology for this module"), etc.
 ################################################################################
 
