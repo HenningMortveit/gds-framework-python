@@ -2,7 +2,7 @@
 # Feb. 4 2014
 # This module stores a set of biology networks. A network object has a graph, 
 # a list of functions, and information such as bibtex reference,
-# name, domain("biology for this module"), etc.
+# name, domain("biology" for this module), etc.
 ################################################################################
 
 import networkx as nx
