@@ -87,7 +87,10 @@ class Activity :
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
-        function = n * [self.func]
+	if isinstance(self.func,list) :
+	    function = self.func
+	else:
+            function = n * [self.func]
     	stateObject = n * [gds.state.State(0, 2)]
     	self.gds = gds.GDS(self.sg, function, stateObject, False)
 

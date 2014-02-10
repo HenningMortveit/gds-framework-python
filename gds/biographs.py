@@ -8,6 +8,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import state
+import Activity
 
 class MendozaAlvarezBuylla() :
     
@@ -87,4 +88,19 @@ class generalizedThreshold :
         for j in indexList :         
 	        sum += s[j].x*g[j][i]['weight']	    
         return state.State( 0 if sum <= self.k else 1, 2) 
+
+def main() :
+    M = MendozaAlvarezBuylla()
+    X = M.GetGraph()
+    activity = list()
+
+    for node in X.nodes() :
+        f = M.GetFunctionList()
+        A = Activity.Activity(X, f, node)
+        A.ComputeActivity()
+        activity.append(A.GetActivity())
+    print activity
+
+if __name__ == "__main__" :
+    main()
 
