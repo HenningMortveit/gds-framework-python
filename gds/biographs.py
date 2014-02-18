@@ -13,7 +13,7 @@ import Activity
 class MendozaAlvarezBuylla() :
     
     def __init__(self) :
-	self.bibtex = """@article{demongeot2010attraction,
+        self.bibtex = """@article{demongeot2010attraction,
   			title={Attraction basins as gauges of robustness against boundary conditions in biological complex systems},
   			author={Demongeot, Jacques and Goles, Eric and Morvan, Michel and Noual, Mathilde and Sen{\'e}, Sylvain},
   			journal={PloS one},
@@ -24,10 +24,10 @@ class MendozaAlvarezBuylla() :
   			publisher={Public Library of Science}
 			}
 			"""
-	self.name = "Original Mendoza & Alvarez-Buylla Network"
-	self.domain = "biology"
+        self.name = "Original Mendoza & Alvarez-Buylla Network"
+        self.domain = "biology"
         self.g = self.CreateGraph()
-	self.f = self.SetFunctionList()
+        self.f = self.SetFunctionList()
 
     def CreateGraph(self) :
     	X = nx.DiGraph()
