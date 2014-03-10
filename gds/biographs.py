@@ -80,10 +80,10 @@ class MendozaAlvarezBuylla() :
 
 
 
-class I5GroupTTSS
+class I5GroupTTSS :
 
     def __init__(self) :
-    self.bibtex = """@article{MacLean2010Boolean,
+    	self.bibtex = """@article{MacLean2010Boolean,
         title = { A Boolean Model of the Pseudomonas syringae hrp Regulon Predicts a Tightly Regulated System} ,
         author = {MacLean, Daniel and Studholme , David J.} ,
         journal = {PloS one},
@@ -94,17 +94,14 @@ class I5GroupTTSS
         publisher = {Public Library of Science}
         }
         """
-    
-    
-    
-    self.name = " Pseudomonas syringae of I[5] group "
-    self.domain = "biology"
-    self.g = CreateGraph()
-    self.f = self.SetFunctionList()
+    	self.name = " Pseudomonas syringae of I[5] group "
+    	self.domain = "biology"
+    	self.g = CreateGraph()
+    	self.f = self.SetFunctionList()
 
     def CreateGraph(self) :
-    Y = nx.DiGraph()
-    edgeSet = [("gacSgacA" , "hrpRS", {"weight":1}) , ("gacSgacA" , "rponN", {"weight":1}) ,
+    	Y = nx.DiGraph()
+    	edgeSet = [("gacSgacA" , "hrpRS", {"weight":1}) , ("gacSgacA" , "rponN", {"weight":1}) ,
                ("hrpRS" , "hrpL", {"weight":1}) , ("rponN" , "hrpV" , {"weight":1}) ,
                ("rponN" , "hrpL", {"weight":1}) , ("hrpL" , "hrpV", {"weight":1}) ,
                ("hrpL" , "hrpG", {"weight":1}) , ("hrpL" , "hrpA" , {"weight":1}) ,
@@ -112,34 +109,34 @@ class I5GroupTTSS
                ("hrpG" , "hrpV" , {"weight": -1})
                ]
         
-    Y.add_edges_from(edgeSet)
+    	Y.add_edges_from(edgeSet)
             
-    self.labelMap = {"gacSgacA" : 0 , "hrpRS" : 1 , "rpoN" : 2 , "hrpV" : 3 , "hrpL" : 4 , "hrpG" : 5 , "hrpA" : 6 }
+    	self.labelMap = {"gacSgacA" : 0 , "hrpRS" : 1 , "rpoN" : 2 , "hrpV" : 3 , "hrpL" : 4 , "hrpG" : 5 , "hrpA" : 6 }
             
-    return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
+    	return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
             
     def SetFunctionList(self) :
-    threshold = [0, 1, 1, 2, 2, 1, 1]
-    f = list()
+    	threshold = [0, 1, 1, 2, 2, 1, 1]
+    	f = list()
         for t in threshold :
-        f.append(generalizedThreshold(t))
-    return f
+            f.append(generalizedThreshold(t))
+    	return f
 
 
     def GetGraph(self) :
-    return self.g
+    	return self.g
                 
     def GetFunctionList(self) :
-    return self.f
+    	return self.f
                     
     def GetBibtex(self) :
-    return self.bibtex
+    	return self.bibtex
                 
     def GetName(self) :
-    return self.name
+    	return self.name
                     
     def GetDomain(self) :
-    return self.domain
+    	return self.domain
                
                
 
