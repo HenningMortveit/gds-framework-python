@@ -76,7 +76,72 @@ class MendozaAlvarezBuylla() :
     
     def GetDomain(self) :
 	return self.domain
-	
+
+
+
+
+class I5GroupTTSS
+
+    def __init__(self) :
+    self.bibtex = """@article{MacLean2010Boolean,
+        title = { A Boolean Model of the Pseudomonas syringae hrp Regulon Predicts a Tightly Regulated System} ,
+        author = {MacLean, Daniel and Studholme , David J.} ,
+        journal = {PloS one},
+        volume = {5},
+        number = {2},
+        pages = {e9101},
+        year = {2010},
+        publisher = {Public Library of Science}
+        }
+        """
+    
+    
+    
+    self.name = " Pseudomonas syringae of I[5] group "
+    self.domain = "biology"
+    self.g = CreateGraph()
+    self.f = self.SetFunctionList()
+
+    def CreateGraph(self) :
+    Y = nx.DiGraph()
+    edgeSet = [("gacSgacA" , "hrpRS", {"weight":1}) , ("gacSgacA" , "rponN", {"weight":1}) ,
+               ("hrpRS" , "hrpL", {"weight":1}) , ("rponN" , "hrpV" , {"weight":1}) ,
+               ("rponN" , "hrpL", {"weight":1}) , ("hrpL" , "hrpV", {"weight":1}) ,
+               ("hrpL" , "hrpG", {"weight":1}) , ("hrpL" , "hrpA" , {"weight":1}) ,
+               ("hrpA" , "hrpRS" , {"weight":2}) , ("hrpV" , "hrpRS", {"weight": -1}) ,
+               ("hrpG" , "hrpV" , {"weight": -1})
+               ]
+        
+    Y.add_edges_from(edgeSet)
+            
+    self.labelMap = {"gacSgacA" : 0 , "hrpRS" : 1 , "rpoN" : 2 , "hrpV" : 3 , "hrpL" : 4 , "hrpG" : 5 , "hrpA" : 6 }
+            
+    return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
+            
+    def SetFunctionList(self) :
+    threshold = [0, 1, 1, 2, 2, 1, 1]
+    f = list()
+        for t in threshold :
+        f.append(generalizedThreshold(t))
+    return f
+
+
+    def GetGraph(self) :
+    return self.g
+                
+    def GetFunctionList(self) :
+    return self.f
+                    
+    def GetBibtex(self) :
+    return self.bibtex
+                
+    def GetName(self) :
+    return self.name
+                    
+    def GetDomain(self) :
+    return self.domain
+               
+               
 
 class generalizedThreshold :
 
@@ -85,9 +150,9 @@ class generalizedThreshold :
 
     def __call__(self, g, s, indexList, i) :
         sum = 0
-        for j in indexList :         
-	        sum += s[j].x*g[j][i]['weight']	    
-        return state.State( 0 if sum <= self.k else 1, 2) 
+        for j in indexList :
+	        sum += s[j].x*g[j][i]['weight']
+        return state.State( 0 if sum <= self.k else 1, 2)
 
 def main() :
     M = MendozaAlvarezBuylla()
