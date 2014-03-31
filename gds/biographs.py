@@ -80,7 +80,7 @@ class MendozaAlvarezBuylla() :
 
 
 
-class I5GroupTTSS :
+class I5GroupTTSS() :
 
     def __init__(self) :
     	self.bibtex = """@article{MacLean2010Boolean,
@@ -96,7 +96,7 @@ class I5GroupTTSS :
         """
     	self.name = " Pseudomonas syringae of I[5] group "
     	self.domain = "biology"
-    	self.g = CreateGraph()
+    	self.g = self.CreateGraph()
     	self.f = self.SetFunctionList()
 
     def CreateGraph(self) :
@@ -111,7 +111,7 @@ class I5GroupTTSS :
         
     	Y.add_edges_from(edgeSet)
             
-    	self.labelMap = {"gacSgacA" : 0 , "hrpRS" : 1 , "rpoN" : 2 , "hrpV" : 3 , "hrpL" : 4 , "hrpG" : 5 , "hrpA" : 6 }
+    	self.labelMap = {"gacSgacA" : 0 , "hrpRS" : 1 , "rponN" : 2 , "hrpV" : 3 , "hrpL" : 4 , "hrpG" : 5 , "hrpA" : 6 }
             
     	return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
             
@@ -152,7 +152,7 @@ class generalizedThreshold :
         return state.State( 0 if sum <= self.k else 1, 2)
 
 def main() :
-    M = MendozaAlvarezBuylla()
+    M = I5GroupTTSS()
     X = M.GetGraph()
     activity = list()
 
