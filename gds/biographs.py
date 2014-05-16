@@ -152,7 +152,7 @@ class generalizedThreshold :
         return state.State( 0 if sum <= self.k else 1, 2)
 
 def main() :
-    M = I5GroupTTSS()
+    M = MendozaAlvarezBuylla()
     X = M.GetGraph()
     activity = list()
 
