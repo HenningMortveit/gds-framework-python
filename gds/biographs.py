@@ -116,11 +116,31 @@ class I5GroupTTSS() :
     	return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
             
     def SetFunctionList(self) :
-    	threshold = [0, 1, 1, 2, 2, 1, 1]
-    	f = list()
-        for t in threshold :
-            f.append(generalizedThreshold(t))
-    	return f
+		f = list()
+		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6]
+		return f
+
+    def f0(self, g, s, indexList, i):
+		image = s[0].x
+		return state.State(image)
+    def f1(self, g, s, indexList, i):
+		image = s[0].x and s[3].x or s[6].x
+		return state.State(image)
+    def f2(self, g, s, indexList, i):
+		image = s[0].x
+		return state.State(image)
+    def f3(self, g, s, indexList, i):
+		image = s[4].x and s[2].x and (not s[5].x)
+		return state.State(image)
+    def f4(self, g, s, indexList, i):
+		image = s[2].x and s[1].x
+		return state.State(image)
+    def f5(self, g, s, indexList, i):
+		image = s[4].x
+		return state.State(image)
+    def f6(self, g, s, indexList, i):
+		image = s[4].x
+		return state.State(image)
 
 
     def GetGraph(self) :
@@ -152,7 +172,7 @@ class generalizedThreshold :
         return state.State( 0 if sum <= self.k else 1, 2)
 
 def main() :
-    M = MendozaAlvarezBuylla()
+    M = I5GroupTTSS()
     X = M.GetGraph()
     activity = list()
 
