@@ -24,7 +24,8 @@ class MendozaAlvarezBuylla() :
   			publisher={Public Library of Science}
 			}
 			"""
-        self.name = "Original Mendoza & Alvarez-Buylla Network"
+	self.name = "MendozaAlvarezBuylla"
+        self.description = "Original Mendoza & Alvarez-Buylla Network"
         self.domain = "biology"
         self.g = self.CreateGraph()
         self.f = self.SetFunctionList()
@@ -94,7 +95,8 @@ class I5GroupTTSS() :
         publisher = {Public Library of Science}
         }
         """
-    	self.name = " Pseudomonas syringae of I[5] group "
+	self.name = "I5GroupTTSS"
+    	self.description = " Pseudomonas syringae of I[5] group "
     	self.domain = "biology"
     	self.g = self.CreateGraph()
     	self.f = self.SetFunctionList()
@@ -158,7 +160,96 @@ class I5GroupTTSS() :
     def GetDomain(self) :
     	return self.domain
                
-               
+class MammalianCellCyclePBN:
+    def __init__(self) :
+    	self.bibtex = """@article{qian2009long,
+  	title={On the long-run sensitivity of probabilistic Boolean networks},
+  	author={Qian, Xiaoning and Dougherty, Edward R},
+  	journal={Journal of theoretical biology},
+  	volume={257},
+  	number={4},
+  	pages={560--577},
+  	year={2009},
+  	publisher={Elsevier}
+	}
+        """
+	self.name = "MammalianCellCyclePBN"
+    	self.description = "wild-type mammalian cell cycle network"
+    	self.domain = "biology"
+    	self.g = self.CreateGraph()
+    	self.f = self.SetFunctionList()
+
+    def CreateGraph(self) :
+    	Y = nx.DiGraph()
+    	edgeSet = [("CycD" , "CycD"), ("CycD" , "Rb"), ("CycD" , "p27"), 
+		   ("Rb", "CycE"), ("Rb", "E2F"), ("Rb", "CycA"), 
+		   ("p27", "p27"), ("p27", "Rb"), ("p27" , "Cdh1"), ("p27" , "E2F"), ("p27" , "CycE"),
+		   ("E2F", "CycA"), ("E2F", "CycE"), 
+	           ("CycE", "CycE"), ("CycE", "Rb"), ("CycE", "p27"),
+		   ("CycA", "CycA"), ("CycA", "Rb"), ("CycA", "E2F"), ("CycA", "p27"), ("CycA", "Cdh1"), ("CycA", "UbcH10"), 
+		   ("Cdc20", "CycB"), ("Cdc20", "UbcH10"), ("Cdc20", "CycA"), ("Cdc20", "Cdh1"),
+		   ("Cdh1", "CycA"), ("Cdh1", "CycB"), ("Cdh1", "Cdc20"), ("Cdh1", "CycA"), ("Cdh1", "UbcH10"), 
+		   ("UbcH10", "UbcH10"), ("UbcH10", "CycA"), 
+		   ("CycB", "UbcH10"), ("CycB", "Cdc20"), ("CycB", "p27"), ("CycB", "Rb"), ("CycB", "E2F"),            
+               ]
+        
+    	Y.add_edges_from(edgeSet)
+            
+    	self.labelMap = {"CycD" : 0 , "Rb" : 1 , "p27" : 2 , "E2F" : 3 , "CycE" : 4 , "CycA" : 5 , "Cdc20" : 6, "Cdh1" : 7, "UbcH10" : 8, "CycB" : 9}
+            
+    	return nx.DiGraph(nx.relabel_nodes(Y,self.labelMap))
+            
+    def SetFunctionList(self) :
+		f = list()
+		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6, self.f7, self.f8, self.f9]
+		return f
+
+    def f0(self, g, s, indexList, i):
+		image = s[0].x
+		return state.State(image)
+    def f1(self, g, s, indexList, i):
+		image = ((not s[0].x) and (not s[4].x) and (not s[5].x)) or (s[2].x and (not s[0].x) and (not s[9].x)) 
+		return state.State(image)
+    def f2(self, g, s, indexList, i):
+		image = ((not s[0].x) and (not s[4].x) and (not s[5].x)) or (s[2].x and not(s[4].x and s[5].x) and (not s[0].x) and (not s[9].x))
+		return state.State(image)
+    def f3(self, g, s, indexList, i):
+		image = ((not s[1].x) and (not s[5].x) and (not s[9].x)) or (s[2].x and (not s[1].x) and (not s[9].x))
+		return state.State(image)
+    def f4(self, g, s, indexList, i):
+		image = s[3].x and (not s[1].x)
+		return state.State(image)
+    def f5(self, g, s, indexList, i):
+		image = (s[3].x and (not s[1].x) and (not s[6].x) and not(s[7].x and s[8].x)) or (s[5].x and (not s[1].x) and (not s[6].x) and not(s[7].x and s[8].x))
+		return state.State(image)
+    def f6(self, g, s, indexList, i):
+		image = s[9].x
+		return state.State(image)
+    def f7(self, g, s, indexList, i):
+		image = ((not s[5].x) and (not s[9].x)) or s[6].x or (s[2].x and (not s[9].x))
+ 		return state.State(image)
+    def f8(self, g, s, indexList, i):
+		image = (not s[7].x) or (s[7].x and s[8].x and (s[6].x or s[5].x or s[9].x))
+		return state.State(image)
+    def f9(self, g, s, indexList, i):
+		image = (not s[6].x) and (not s[7].x)
+		return state.State(image)
+
+
+    def GetGraph(self) :
+    	return self.g
+                
+    def GetFunctionList(self) :
+    	return self.f
+                    
+    def GetBibtex(self) :
+    	return self.bibtex
+                
+    def GetName(self) :
+    	return self.name
+                    
+    def GetDomain(self) :
+    	return self.domain
 
 class generalizedThreshold :
 
@@ -172,6 +263,18 @@ class generalizedThreshold :
         return state.State( 0 if sum <= self.k else 1, 2)
 
 def main() :
+    M = MendozaAlvarezBuylla()
+    X = M.GetGraph()
+    activity = list()
+
+    for node in X.nodes() :
+        f = M.GetFunctionList()
+        A = Activity.Activity(X, f, node)
+        A.ComputeActivity()
+        activity.append(A.GetActivity())
+    print "Average activity for network %s:" %M.GetName()
+    print activity
+
     M = I5GroupTTSS()
     X = M.GetGraph()
     activity = list()
@@ -181,6 +284,19 @@ def main() :
         A = Activity.Activity(X, f, node)
         A.ComputeActivity()
         activity.append(A.GetActivity())
+    print "Average activity for network %s:" %M.GetName()
+    print activity
+
+    M = MammalianCellCyclePBN()
+    X = M.GetGraph()
+    activity = list()
+
+    for node in X.nodes() :
+        f = M.GetFunctionList()
+        A = Activity.Activity(X, f, node)
+        A.ComputeActivity()
+        activity.append(A.GetActivity())
+    print "Average activity for network %s:" %M.GetName()
     print activity
 
 if __name__ == "__main__" :
