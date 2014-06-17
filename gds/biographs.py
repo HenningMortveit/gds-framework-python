@@ -9,6 +9,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import state
 import Activity
+import functions
 
 class MendozaAlvarezBuylla() :
     
@@ -61,6 +62,8 @@ class MendozaAlvarezBuylla() :
 	f = list()
         for t in threshold :
 	    f.append(generalizedThreshold(t))
+	#for node in self.g.nodes():
+	#    f.append(functions.threshold(1))
 	return f
     
     def GetGraph(self) :
@@ -120,6 +123,8 @@ class I5GroupTTSS() :
     def SetFunctionList(self) :
 		f = list()
 		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6]
+		#for node in self.g.nodes():
+	    	#    f.append(functions.threshold(1))
 		return f
 
     def f0(self, g, s, indexList, i):
@@ -191,8 +196,8 @@ class MammalianCellCyclePBN:
 		   ("Cdh1", "CycA"), ("Cdh1", "CycB"), ("Cdh1", "Cdc20"), ("Cdh1", "CycA"), ("Cdh1", "UbcH10"), 
 		   ("UbcH10", "UbcH10"), ("UbcH10", "CycA"), 
 		   ("CycB", "UbcH10"), ("CycB", "Cdc20"), ("CycB", "p27"), ("CycB", "Rb"), ("CycB", "E2F"),            
-               ]
-        
+              ]
+	
     	Y.add_edges_from(edgeSet)
             
     	self.labelMap = {"CycD" : 0 , "Rb" : 1 , "p27" : 2 , "E2F" : 3 , "CycE" : 4 , "CycA" : 5 , "Cdc20" : 6, "Cdh1" : 7, "UbcH10" : 8, "CycB" : 9}
@@ -202,6 +207,8 @@ class MammalianCellCyclePBN:
     def SetFunctionList(self) :
 		f = list()
 		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6, self.f7, self.f8, self.f9]
+		#for node in self.g.nodes():
+	    	#    f.append(functions.threshold(1))
 		return f
 
     def f0(self, g, s, indexList, i):
@@ -260,7 +267,7 @@ class generalizedThreshold :
         sum = 0
         for j in indexList :
 	        sum += s[j].x*g[j][i]['weight']
-        return state.State( 0 if sum <= self.k else 1, 2)
+        return state.State( 0 if sum < self.k else 1, 2)
 
 def main() :
     M = MendozaAlvarezBuylla()
