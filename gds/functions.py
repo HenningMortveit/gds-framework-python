@@ -30,7 +30,6 @@ def majority(g, s, indexList, i) :
     else :
         return state.State(0, 2)
 
-
 def nor(g, s, indexList, i) :
     """Boolean nor function"""
 
@@ -47,6 +46,17 @@ def nand(g, s, indexList, i) :
     for k in indexList :
         sum += s[k].x
     return state.State(0 if sum == l else 1, 2)
+
+class indicator :
+    def __init__(self, h) :
+        self.h = h
+
+    def __call__(self, g, s, indexList, i) :
+        sum = 0
+        for j in indexList :
+            sum += s[j].x
+        return state.State(  1 if sum == self.h else 0, 2)
+
 
 
 class threshold :

@@ -60,11 +60,14 @@ class MendozaAlvarezBuylla() :
     def SetFunctionList(self) :
 	threshold = [0, 0, 3, -1, 1, 0, 0, 1, -1, 0, 0, 0]
 	f = list()
-        for t in threshold :
-	    f.append(generalizedThreshold(t))
-	#for node in self.g.nodes():
+        #for t in threshold :
+	#    f.append(generalizedThreshold(t))
+	for node in self.g.nodes():
 	#    f.append(functions.threshold(1))
+	#    f.append(functions.indicator(4))
+	    f.append(functions.nor)
 	return f
+
     
     def GetGraph(self) :
 	return self.g
@@ -122,9 +125,11 @@ class I5GroupTTSS() :
             
     def SetFunctionList(self) :
 		f = list()
-		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6]
-		#for node in self.g.nodes():
+		#f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6]
+		for node in self.g.nodes():
 	    	#    f.append(functions.threshold(1))
+		#    f.append(functions.indicator(4))
+		    f.append(functions.nor)
 		return f
 
     def f0(self, g, s, indexList, i):
@@ -206,9 +211,11 @@ class MammalianCellCyclePBN:
             
     def SetFunctionList(self) :
 		f = list()
-		f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6, self.f7, self.f8, self.f9]
-		#for node in self.g.nodes():
+		#f = [self.f0, self.f1, self.f2, self.f3, self.f4, self.f5, self.f6, self.f7, self.f8, self.f9]
+		for node in self.g.nodes():
 	    	#    f.append(functions.threshold(1))
+		#    f.append(functions.indicator(4))
+		    f.append(functions.nor)
 		return f
 
     def f0(self, g, s, indexList, i):
