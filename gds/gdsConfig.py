@@ -27,9 +27,9 @@ class gdsConfig :
         return LoadObject(fileName)
 
     def setFunction(self, func) :
-        if func =="threshold" :
+        if func.value =="threshold" :
             try:
-                t = int(self.cs.parameterDict["functionSpec/function/thresholdValue"].value)
+                t = int(func.subParamList[0].value)
             except KeyError:
                 print "Failed to load parameter<%s>" %func
             function = functions.threshold(t)
@@ -38,14 +38,17 @@ class gdsConfig :
     def setFunctionList(self) :
         n = len(self.graph.nodes())
         funcType = self.cs.parameterDict["functionSpec"].value
+        functions = self.cs.parameterDict["functionSpec"].subParamList
         if funcType == "uniform" :
-            func = self.cs.parameterDict["functionSpec/function"].value
+            func = functions[0]
             f = self.setFunction(func)
             for i in range(n) :
                 self.functionList.append(f)
         elif funcType == "nonuniform" :
-            functionSpecElement = self.cs.tree.find(".//parameter[@key='functionSpec']")
-            
+            functions = self.cs.parameterDict["functionSpec"].subParamList
+            for func in functions:
+                f = self.setFunction(func)
+                self.functionList.append(f)
 
     def setSchedule(self) :
         self.schedule = self.cs.parameterDict["schedule"].value
