@@ -18,9 +18,10 @@ class gdsConfig :
         self.baseConfigFile = cs.baseConfigFile
         self.graph = self.setGraph()
         self.functionList = []
-        self.setFunctionList()
+        self.functionList = self.setFunctionList()
         self.doCircle = str2bool(cs.parameterDict["doCircle"].value)
         self.setSchedule()
+        self.gds = self.setGDS()
 
     def setGraph(self) :
         fileName = self.cs.parameterDict["graph"].value
@@ -31,24 +32,72 @@ class gdsConfig :
             try:
                 t = int(func.subParamList[0].value)
             except KeyError:
-                print "Failed to load parameter<%s>" %func
-            function = functions.threshold(t)
-            return function
+                print "Failed to load threshold value!"
+            f = functions.threshold(t)
+        elif func.value =="indicator" :
+            try:
+                t = int(func.subParamList[0].value)
+            except KeyError:
+                print "Failed to load threshold value!"
+            f = functions.indicator(t)
+        elif func.value =="biThreshold" :
+            try:
+                kup = int(func.subParamList[0].value)
+                kdown = int(func.subParamList[1].value)
+            except KeyError:
+                print "Failed to load threshold value!"
+            f = functions.biThreshold(kup, kdown)
+        elif func.value =="inverseThreshold" :
+            try:
+                t = int(func.subParamList[0].value)
+            except KeyError:
+                print "Failed to load threshold value!"
+            f = functions.inverseThreshold(t)
+        elif func.value =="dynBiThreshold" :
+            try:
+                D01up = int(func.subParamList[0].value)
+                D10up = int(func.subParamList[1].value)
+                D01down = int(func.subParamList[2].value)
+                D10down = int(func.subParamList[3].value)
+            except KeyError:
+                print "Failed to load threshold value!"
+            f = functions.dynBiThreshold(D01up, D10up, D01down, D10down)
+        elif func.value =="wolfram" :
+            try:
+                r = int(func.subParamList[0].value)
+            except KeyError:
+                print "Failed to load rule number!"
+            f = functions.wolfram(r)
+        elif func.value == "parity" :
+            f = functions.parity
+        elif func.value == "majority" :
+            f = functions.majority
+        elif func.value == "nor" :
+            f = functions.nor
+        elif func.value == "nand" :
+            f = functions.nand
+	else : 
+            raise Exception("Error: Unknown function type! Available options: <threshold, indicator, biThreshold, inverseThreshold, dynBiThreshold, wolfram, parity, majority, nor, nand>")
+        return f
 
     def setFunctionList(self) :
         n = len(self.graph.nodes())
         funcType = self.cs.parameterDict["functionSpec"].value
         functions = self.cs.parameterDict["functionSpec"].subParamList
+        functionList = []
         if funcType == "uniform" :
             func = functions[0]
             f = self.setFunction(func)
             for i in range(n) :
-                self.functionList.append(f)
+                functionList.append(f)
         elif funcType == "nonuniform" :
             functions = self.cs.parameterDict["functionSpec"].subParamList
             for func in functions:
                 f = self.setFunction(func)
-                self.functionList.append(f)
+                functionList.append(f)
+            if len(functionList) != n :
+                raise Exception("Error: Number of functions and nodes does not match!")
+        return functionList
 
     def setSchedule(self) :
         self.schedule = self.cs.parameterDict["schedule"].value
@@ -56,8 +105,21 @@ class gdsConfig :
             self.permutation = []
             seq = self.cs.parameterDict["schedule/permutation"].value.split(',')
             for i in seq :
-                self.permutation.append(i)
-        print self.permutation
+                self.permutation.append(int(i))
+        elif self.schedule == "parallel" :
+            pass
+        else :
+            raise Exception("Error: Unknown schedule! Available options: <sequential, parallel>")
+
+    def setGDS(self) :
+        n = len(self.graph.nodes())
+        stateObj = n * [gds.state.State(0, 2)]
+        GDS = gds.GDS(self.graph, self.functionList, stateObj, self.doCircle)
+        if self.schedule == "sequential" :
+            GDS.SetSequence(self.permutation)
+        elif self.schedule == "parallel" :
+            GDS.SetParallel()
+        return GDS    
  
 
 def main() :
@@ -67,10 +129,7 @@ def main() :
     DumpObject("/home/sichao/gds/gds/graphs/g1", X)
     cs = loadConfig("/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml")
     config = gdsConfig(cs)
-    n = len(config.graph.nodes())
-    stateObj = n * [gds.state.State(0, 2)]
-    print config.doCircle
-    gds1 = gds.GDS(config.graph, config.functionList, stateObj, config.doCircle)
+    gds1 = config.gds
 
     transitions = algorithms.GenerateTransitions(gds1)
     fixedPoints = algorithms.FixedPoints(gds1, transitions)
