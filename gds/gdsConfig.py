@@ -77,7 +77,8 @@ class gdsConfig :
         elif func.value == "nand" :
             f = functions.nand
 	else : 
-            raise Exception("Error: Unknown function type! Available options: <threshold, indicator, biThreshold, inverseThreshold, dynBiThreshold, wolfram, parity, majority, nor, nand>")
+            raise Exception("""Error: Unknown function type! Available options: 
+                   <threshold, indicator, biThreshold, inverseThreshold, dynBiThreshold, wolfram, parity, majority, nor, nand>""")
         return f
 
     def setFunctionList(self) :
@@ -123,10 +124,10 @@ class gdsConfig :
  
 
 def main() :
-    pi = [0,1,2,3];
     X = gds.graphs.CircleGraph(4)
+    X.add_edge(0, 2)
 
-    DumpObject("/home/sichao/gds/gds/graphs/g1", X)
+    DumpObject("/home/sichao/gds/gds/graphs/g2", X)
     cs = loadConfig("/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml")
     config = gdsConfig(cs)
     gds1 = config.gds
@@ -154,4 +155,6 @@ def main() :
 
     for x,y in enumerate(transitions) :
         print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
-main()
+
+if __name__ == "__main__" :
+    main()
