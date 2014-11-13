@@ -32,7 +32,7 @@ def main() :
     designType = "fullFact" 
     designRegion = dict()
     designRegion["graph"] = ["/home/sichao/gds/gds/graphs/g1","/home/sichao/gds/gds/graphs/g2"]
-    designRegion["functionSpec/f1/thresholdValue"] = [1,2,3]
+    designRegion["functionSpec/f1/thresholdValue"] = [1,2]
     outFolder = "./ExpDesign/"
     doeName = outFolder + "gdsFullFact.xml" 
     genDOE(baseConfigFile, designType, designRegion, doeName, outFolder)
