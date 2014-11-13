@@ -31,11 +31,38 @@ def main() :
     baseConfigFile = "/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml"
     designType = "fullFact" 
     designRegion = dict()
-    designRegion["graph"] = ["home/sichao/gds/gds/graphs/g1","home/sichao/gds/gds/graphs/g2"]
+    designRegion["graph"] = ["/home/sichao/gds/gds/graphs/g1","/home/sichao/gds/gds/graphs/g2"]
     designRegion["functionSpec/f1/thresholdValue"] = [1,2,3]
     outFolder = "./ExpDesign/"
     doeName = outFolder + "gdsFullFact.xml" 
     genDOE(baseConfigFile, designType, designRegion, doeName, outFolder)
+    cs = loadConfig("ExpDesign/gdsConfig-cell0.xml")
+    config = gdsConfig(cs)
+    gds1 = config.gds
+
+    transitions = algorithms.GenerateTransitions(gds1)
+    fixedPoints = algorithms.FixedPoints(gds1, transitions)
+
+    p = phase_space.PhaseSpace(gds1)
+
+    fixedPoints = p.GetFixedPoints()
+    periodicPoints = p.GetPeriodicPoints()
+    components = p.GetComponents()
+
+    print "Fixed points: "
+    for i in fixedPoints :
+        print i, gds1.IntegerToState(i)
+
+    print "Periodic points: "
+    for i, cycle in enumerate(periodicPoints) :
+        print i
+        for j in cycle :
+            print gds1.IntegerToState(j)
+
+    print "Components: ", components
+
+    for x,y in enumerate(transitions) :
+        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
 
 if __name__ == "__main__" :
