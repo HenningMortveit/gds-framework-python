@@ -9,6 +9,7 @@ import gds.state_algorithms
 import gds.phase_space
 import gds.sequence
 import sys
+import glob
 sys.path.append("/home/sichao/svn/Sichao/code")
 from XMLConfig import *
 from DOE import *
@@ -23,46 +24,56 @@ def genDOE(baseConfigFile, designType, designRegion, doeName, outFolder) :
         doe.setLevels(key, levels)
     saveDOE(doe, doeName)
     if designType == "fullFact" :
-        namePattern = outFolder + "gdsConfig-cell%s.xml" %("%i")
+        namePattern = outFolder + "config_bithreshold_cell%s.xml" %("%i")
         samples = fullFact(doe)
         genConfig(cs, doe, samples, namePattern)
 
 def main() :
-    baseConfigFile = "/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml"
+    baseConfigFile = "./BiThresholdExpDesign/biThresholdBaseConfig.xml"
     designType = "fullFact" 
     designRegion = dict()
-    designRegion["graph"] = ["/home/sichao/gds/gds/graphs/g1","/home/sichao/gds/gds/graphs/g2"]
-    designRegion["functionSpec/f1/thresholdValue"] = [1,2]
-    outFolder = "./ExpDesign/"
-    doeName = outFolder + "gdsFullFact.xml" 
-    genDOE(baseConfigFile, designType, designRegion, doeName, outFolder)
-    cs = loadConfig("ExpDesign/gdsConfig-cell0.xml")
-    config = gdsConfig(cs)
-    gds1 = config.gds
+    designRegion["functionSpec/function/kup"] = [1,2,3]
+    designRegion["functionSpec/function/kdown"] = [1,2,3]
+    doeName = "./BiThresholdExpDesign/doe_bithreshold_fullfact.xml"
+    configFolder = "./BiThresholdExpDesign/config/"
+    genDOE(baseConfigFile, designType, designRegion, doeName, configFolder)
 
-    transitions = algorithms.GenerateTransitions(gds1)
-    fixedPoints = algorithms.FixedPoints(gds1, transitions)
+    outputFile = "./BiThresholdExpDesign/output"
+    output = open(outputFile, 'w')
+    configFileList = glob.glob(configFolder+"config_bithreshold_cell[0-9]*.xml")
+    for configFile in configFileList :
+        cs = loadConfig(configFile)
+        config = gdsConfig(cs)
+        gds1 = config.gds
+        transitions = algorithms.GenerateTransitions(gds1)
+        fixedPoints = algorithms.FixedPoints(gds1, transitions)
+        output.write("###############################################\n")
+        output.write("kup:" + cs.parameterDict["functionSpec/function/kup"].value + "\n")
+        output.write("kdown:" + cs.parameterDict["functionSpec/function/kdown"].value + "\n")
+        output.write("Number of fixed points:" + str(len(fixedPoints)) + "\n")
+    output.close()
 
-    p = phase_space.PhaseSpace(gds1)
 
-    fixedPoints = p.GetFixedPoints()
-    periodicPoints = p.GetPeriodicPoints()
-    components = p.GetComponents()
+    #p = phase_space.PhaseSpace(gds1)
 
-    print "Fixed points: "
-    for i in fixedPoints :
-        print i, gds1.IntegerToState(i)
+    #fixedPoints = p.GetFixedPoints()
+    #periodicPoints = p.GetPeriodicPoints()
+    #components = p.GetComponents()
 
-    print "Periodic points: "
-    for i, cycle in enumerate(periodicPoints) :
-        print i
-        for j in cycle :
-            print gds1.IntegerToState(j)
+    #print "Fixed points: "
+    #for i in fixedPoints :
+    #    print i, gds1.IntegerToState(i)
 
-    print "Components: ", components
+    #print "Periodic points: "
+    #for i, cycle in enumerate(periodicPoints) :
+    #    print i
+    #    for j in cycle :
+    #        print gds1.IntegerToState(j)
 
-    for x,y in enumerate(transitions) :
-        print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
+    #print "Components: ", components
+
+    #for x,y in enumerate(transitions) :
+    #    print gds1.IntegerToState(x), "->", gds1.IntegerToState(y)
 
 
 if __name__ == "__main__" :

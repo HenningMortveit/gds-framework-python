@@ -124,10 +124,10 @@ class gdsConfig :
  
 
 def main() :
-    X = gds.graphs.CircleGraph(4)
-    X.add_edge(0, 2)
-
-    DumpObject("/home/sichao/gds/gds/graphs/g2", X)
+    #X = gds.graphs.CircleGraph(4)
+    #X.add_edge(0, 2)
+    #DumpObject("/home/sichao/gds/gds/graphs/cir4", X)
+    sys.exit(0)
     cs = loadConfig("/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml")
     config = gdsConfig(cs)
     gds1 = config.gds
