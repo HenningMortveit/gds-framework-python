@@ -1,8 +1,8 @@
 import sys
 sys.path.append("/home/sichao/svn/Sichao/code")
 
-from XMLConfig import *
 from util.file_io import *
+import XMLConfig
 import gds
 import algorithms
 import functions
@@ -19,7 +19,7 @@ class gdsConfig :
         self.graph = self.setGraph()
         self.functionList = []
         self.functionList = self.setFunctionList()
-        self.doCircle = str2bool(cs.parameterDict["doCircle"].value)
+        self.doCircle = XMLConfig.str2bool(cs.parameterDict["doCircle"].value)
         self.setSchedule()
         self.gds = self.setGDS()
 
@@ -127,8 +127,8 @@ def main() :
     #X = gds.graphs.CircleGraph(4)
     #X.add_edge(0, 2)
     #DumpObject("/home/sichao/gds/gds/graphs/cir4", X)
-    sys.exit(0)
-    cs = loadConfig("/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml")
+    #sys.exit(0)
+    cs = XMLConfig.loadConfig("/home/sichao/svn/Sichao/Thesis/DigitalObjects/gdsConfig.xml")
     config = gdsConfig(cs)
     gds1 = config.gds
 
