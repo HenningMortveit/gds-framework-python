@@ -136,7 +136,7 @@ def BiThresholdExample() :
     doCircle = False
 #    X.add_edge(0,2)
 
-    f = n * [gds.functions.biThreshold(1,2)]
+    f = n * [gds.functions.biThreshold(2,1)]
     stateObject = n * [gds.state.State(0, 2)]
     gds1 = gds.gds.GDS(X, f, stateObject, doCircle)
     #gds1.SetSequence(pi)
@@ -1108,7 +1108,7 @@ def PlotStabilityArray(diagrams, density=True) :
     
 
 def main() :
-    biographExample()
+    BiThresholdExample()
     sys.exit(0)
 #---------------------------------------------
 

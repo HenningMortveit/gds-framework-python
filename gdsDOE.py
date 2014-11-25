@@ -29,6 +29,15 @@ def genDOE(baseConfigFile, designType, designRegion, doeName, outFolder) :
         genConfig(cs, doe, samples, namePattern)
 
 def main() :
+    baseConfigFile = "./NonUniformExpDesign/nonUniformBaseConfig.xml"
+    designType = "fullFact"
+    designRegion = dict()
+    designRegion["functionSpec/f1/thresholdValue"] = [1,2,3,4]
+    designRegion["functionSpec/f2/thresholdValue"] = [1,2,3]
+    doeName = "./NonUniformExpDesign/doe_nonuniform.xml"
+    configFolder = "./NonUniformExpDesign/config/"
+    genDOE(baseConfigFile, designType, designRegion, doeName, configFolder)
+    #sys.exit(0)
     baseConfigFile = "./BiThresholdExpDesign/biThresholdBaseConfig.xml"
     designType = "fullFact" 
     designRegion = dict()
