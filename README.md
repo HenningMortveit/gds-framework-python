@@ -1,0 +1,1 @@
+This is a project for research code related to graph dynamical systems (GDS). It it mainly intended for smaller systems (below 20 vertices). It supports phase space calculations, calculations related to equivalences, activity and so on.
