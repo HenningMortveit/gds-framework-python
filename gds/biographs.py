@@ -11,6 +11,128 @@ import state
 import Activity
 import functions
 
+class LacOperon() :
+    
+    def __init__(self, Ge, Le, Lem) :
+
+        self.bibtex = """@inproceedings{Montalva:14,
+  			title={Attraction basins in a lac operon model under different update schedules},
+  			author={Montalva, Marco and Ruz, Gonzalo A. and Goles, Eric},
+  			booktitle={ALIFE 14: Proceedings of the Fourteenth Interantional Conference on the Synthetsis and Simulation of Living Systems},
+
+  			year={2014},
+                        doi = {http://dx.doi.org/10.7551/978-0-262-32621-6-ch109}
+			}
+			"""
+	self.name = "LacOperon"
+        self.description = "Veliz-Cuba and Stigler's lac operon model as reported by Montalva et al"
+        self.domain = "biology"
+        
+        self.Ge = Ge
+        self.Le = Le
+        self.Lem = Lem
+
+        self.g = self.CreateGraph()
+        self.f = self.SetFunctionList()
+
+
+    def CreateGraph(self) :
+    	X = nx.DiGraph()
+    	edges = [("C", "M",{"weight":1}), 
+                 ("M","B",{"weight":1}),
+                 ("M","P",{"weight":1}),
+                 ("B","A",{"weight":1}),
+                 ("P","L",{"weight":1}),
+                 ("R","Rm",{"weight":1}),
+                 ("A","R",{"weight":1}),
+                 ("A","Rm",{"weight":1}),
+                 ("L","A",{"weight":1}),
+                 ("L","Am",{"weight":1}),
+	     	 ("Am","R",{"weight":1}), 
+                 ("Am","Rm",{"weight":1})
+            	]
+    	X.add_edges_from(edges)
+
+    	self.labelMap = {
+            "M" : 0, "P" : 1, "B" : 2, "C" : 3,
+            "R" : 4, "Rm" : 5, "A" : 6, "Am" : 7,
+            "L" : 8, "Lm" : 9
+        }
+
+    	return nx.DiGraph(nx.relabel_nodes(X,self.labelMap))  
+
+ 
+    def fM(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["C"] ].x and not s[ i["R"] ].x and not s[ i["Rm"] ].x
+        return state.State(image)
+
+    def fP(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["M"] ].x 
+        return state.State(image)
+
+    def fB(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["M"] ].x 
+        return state.State(image)
+
+    def fC(self, g, s, indexList, i):
+        i = self.labelMap
+        image = not Ge
+        return state.State(image)
+
+    def fR(self, g, s, indexList, i):
+        i = self.labelMap
+        image = not s[ i["A"] ].x and not s[ i["Am"] ].x
+        return state.State(image)
+
+    def fRm(self, g, s, indexList, i):
+        i = self.labelMap
+        image = (not s[ i["A"] ].x and not s[ i["Am"] ].x) or not s[ i["R"] ].x
+        return state.State(image)
+
+    def fA(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["L"] ].x and s[ i["B"] ]
+        return state.State(image)
+
+    def fAm(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["L"] ].x or s[ i["Lm"] ]
+        return state.State(image)
+
+    def fL(self, g, s, indexList, i):
+        i = self.labelMap
+        image = s[ i["P"] ].x and self.Le and not self.Ge
+        return state.State(image)
+
+    def fLm(self, g, s, indexList, i):
+        i = self.labelMap
+        image = ( (self.Lem and s[ i["P"] ].x) or self.Le ) and not self.Ge
+        return state.State(image)
+
+
+    def SetFunctionList(self) :
+	f = [fM, fP, fB, fC, fR, fRm, fA, fAm, fL, fLm]
+	return f
+    
+    def GetGraph(self) :
+	return self.g
+	
+    def GetFunctionList(self) :
+	return self.f
+	
+    def GetBibtex(self) :
+	return self.bibtex
+	
+    def GetName(self) :
+	return self.name
+    
+    def GetDomain(self) :
+	return self.domain
+
+
 class MendozaAlvarezBuylla() :
     
     def __init__(self) :
