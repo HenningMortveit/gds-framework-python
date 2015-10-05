@@ -27,13 +27,15 @@ class LacOperon() :
 	self.name = "LacOperon"
         self.description = "Veliz-Cuba and Stigler's lac operon model as reported by Montalva et al"
         self.domain = "biology"
-        
+
+        self.SetParams(Ge, Le, Lem)
+        self.g = self.CreateGraph()
+        self.f = self.SetFunctionList()
+
+    def SetParams(self, Ge, Le, Lem) :
         self.Ge = Ge
         self.Le = Le
         self.Lem = Lem
-
-        self.g = self.CreateGraph()
-        self.f = self.SetFunctionList()
 
 
     def CreateGraph(self) :
@@ -49,7 +51,8 @@ class LacOperon() :
                  ("L","A",{"weight":1}),
                  ("L","Am",{"weight":1}),
 	     	 ("Am","R",{"weight":1}), 
-                 ("Am","Rm",{"weight":1})
+                 ("Am","Rm",{"weight":1}),
+                 ("Lm","Am",{"weight":1})
             	]
     	X.add_edges_from(edges)
 
