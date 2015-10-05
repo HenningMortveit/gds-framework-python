@@ -18,6 +18,7 @@ import gds.orientation
 import gds.sequence
 import gds.groups
 
+import gds.biographs
 
 def UpdateSequenceEquivalenceExample() :
 
@@ -89,6 +90,43 @@ def UpdateSequenceEquivalenceExample() :
 
 
 def main() :
+
+    lacOperon = gds.biographs.LacOperon(0, 0, 0)
+
+    g = lacOperon.GetGraph()
+    f = lacOperon.GetFunctionList()
+    n = g.size()
+
+    print g
+    print f
+    print n
+
+    stateObject = n * [gds.state.State(0, 2)]
+
+    gds1 = gds.gds.GDS(g, f, stateObject, False)
+
+    print gds1
+
+    return
+
+    le = gds.equivalence.LinearExtensions( lacOperon.GetGraph() )
+
+    s = list()
+
+    for pi in le :
+        gds1.SetSequence(pi)
+        transitions = gds.algorithms.GenerateTransitions(gds1)
+        if not transitions in s :
+            s.append(transitions)
+
+    print len(s)
+#    p = gds.phase_space.PhaseSpace(gds1)
+
+
+
+
+    sys.exit(0)
+
     UpdateSequenceEquivalenceExample()
 
 
