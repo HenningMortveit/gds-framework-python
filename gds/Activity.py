@@ -41,6 +41,8 @@ class Activity :
         self.graph = g
         self.iNode = iNode
         self.func = f
+        self.labelMap = dict()
+        self.reverseLabelMap = dict()
         if networkx.is_directed(g) :
             self.SetDiSubgraph()
         else :
@@ -65,31 +67,63 @@ class Activity :
         self.d2 = len(self.n2)
         self.subNodes = [self.iNode]
         self.subNodes = self.subNodes + self.n1 + self.n2
+        self.subNodes = list(set(self.subNodes)) #eliminate duplicated nodes resulted from loop
         self.subgraph = self.graph.subgraph(self.subNodes)
+        #print self.subNodes
 
         #relabel the subgraph nodes, follow the consecutive order: 0, 1, 2.....
         #subgraph keeps the node label from the original graph, sg keeps its own node label
-        labelMap = dict()
         l = 0
         for node in self.subNodes :
-            labelMap[node] = l
+            self.labelMap[node] = l
+            self.reverseLabelMap[l] = node
             l = l + 1
-        self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,labelMap))
+        #print self.labelMap
+        #print self.reverseLabelMap
+        self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
         self.iNode = 0
     
-        print self.sg.nodes()
-        print self.subNodes
-
     def SetDiSubgraph(self) :
         """Directed version of Setsubgraph"""
-        self.sg = self.graph
+	"""Extract the distance-2 subgraph X(i;2)"""
+        self.n1 = self.graph.neighbors(self.iNode) + self.graph.predecessors(self.iNode)
+        self.n2 = list()
+        for node in self.n1 :
+            neighbor = self.graph.neighbors(node) + self.graph.predecessors(node)
+            for n in neighbor :
+                if (not self.graph.has_edge(n, self.iNode) and n != self.iNode) :
+                    self.n2.append(n)
+        #Delete the duplicated nodes
+        self.n2 = list(set(self.n2))
+
+        self.d1 = len(self.n1)
+        self.d2 = len(self.n2)
+        self.subNodes = [self.iNode]
+        self.subNodes = self.subNodes + self.n1 + self.n2
+        self.subNodes = list(set(self.subNodes)) #eliminate duplicated nodes resulted from loop
+        self.subgraph = self.graph.subgraph(self.subNodes)
+        #print self.subNodes
+
+        #relabel the subgraph nodes, follow the consecutive order: 0, 1, 2.....
+        #subgraph keeps the node label from the original graph, sg keeps its own node label
+        l = 0
+        for node in self.subNodes :
+            self.labelMap[node] = l
+            self.reverseLabelMap[l] = node
+            l = l + 1
+        #print self.labelMap
+        #print self.reverseLabelMap
+        self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
+        self.iNode = 0
 
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
-	if isinstance(self.func,list) :
-	    function = self.func
-	else:
+        if isinstance(self.func,list) : #non-uniform functions
+            function = list()
+            for i in range(n):
+                function.append(self.func[self.reverseLabelMap[i]]) #find the corresponding vertex function from the original function list
+        else:  #uniform founctions
             function = n * [self.func]
     	stateObject = n * [gds.state.State(0, 2)]
     	self.gds = gds.GDS(self.sg, function, stateObject, False)
@@ -179,26 +213,10 @@ class Activity :
         return self.acycNumber
     
 def main() :
-    X = networkx.DiGraph()
-    edges = [
-            [0,1],[1,2],[2,0]
-    ]
-    for e in edges :
-        X.add_edge(e[0],e[1])
-
-    X.add_edge(0,0)
-    f = gds.functions.threshold(2)
-
-    A = Activity(X, f, 0)
-    A.ComputeActivity()
-    print "Chromatic number:",A.GetChromaticNumber()
-    print "Diff:", A.GetDiff()
-    print "Activity:", A.GetActivity()
-
     #networkx.draw(X, pos = networkx.spring_layout(X))
     #plt.show()
 
-    sys.exit(0)
+    #sys.exit(0)
 
     #X = networkx.gnp_random_graph(20,0.2)
     #f = gds.functions.threshold(3)
@@ -227,12 +245,13 @@ def main() :
     #sys.exit(0)
 
     #----------------------------------
-    X = networkx.DiGraph()
+    X = networkx.Graph()
     edges = [
          [1,0],[2,0],[3,0],
          [1,4],[1,5],
          [2,6],[2,7],
-         [3,8],[3,9]
+         [3,8],[3,9],
+         [9,10]
          ]
     for e in edges :
         X.add_edge(e[0], e[1])
@@ -259,12 +278,12 @@ def main() :
     #X.add_edge(1,3)
     #X = networkx.gnp_random_graph(10, 0.25)
     #X.add_node(0)
-    networkx.draw(X,pos=networkx.spring_layout(X))
-    plt.show()
+    #networkx.draw(X,pos=networkx.spring_layout(X))
+    #plt.show()
 
-    f = gds.functions.threshold(1)
+    f = 11*[gds.functions.threshold(1)]
 
-    A = Activity(X, f, 0)
+    A = Activity(X, f, 3)
     A.ComputeActivity()
     print "Chromatic number:",A.GetChromaticNumber()
     print "Diff:", A.GetDiff()
