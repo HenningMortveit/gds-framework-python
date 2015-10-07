@@ -91,6 +91,10 @@ def UpdateSequenceEquivalenceExample() :
 
 def main() :
 
+    UpdateSequenceEquivalenceExample() 
+    return
+
+
     lacOperon = gds.biographs.LacOperon(0, 0, 0)
 
     g = lacOperon.GetGraph()
