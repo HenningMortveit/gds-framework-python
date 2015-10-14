@@ -1,7 +1,7 @@
 #
 # This module has functions for creating some standard graph
 # classes. Graphs are based on the networkx library. All graphs are
-# assumed to have vertex set {0,1, 2, n} for some suitable n.
+# assumed to have vertex set {0,1,2,...,n} for some suitable n.
 #
 
 import copy

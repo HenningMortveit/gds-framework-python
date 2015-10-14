@@ -7,12 +7,22 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
+import gds
 import state
-import Activity
 import functions
 
+import Activity
+
 class LacOperon() :
+    """Description:
+
+    HSM: 14 October 2015. Note that if there are modifications or
+    corrections, then iMap and function definitions must be kept
+    consistent. There is no link between them. The same applies to the
+    network.
     
+    """ 
+   
     def __init__(self, Ge, Le, Lem) :
 
         self.bibtex = """@inproceedings{Montalva:14,
@@ -29,95 +39,132 @@ class LacOperon() :
         self.domain = "biology"
 
         self.SetParams(Ge, Le, Lem)
+        self.iMap = []   # index map as for GDS
         self.g = self.CreateGraph()
         self.f = self.SetFunctionList()
+        self.F = self.ConstructGDS()
 
     def SetParams(self, Ge, Le, Lem) :
         self.Ge = Ge
         self.Le = Le
         self.Lem = Lem
 
-
     def CreateGraph(self) :
+
+        self.iMap = []   # index map as for GDS
+
     	X = nx.DiGraph()
-    	edges = [("C", "M",{"weight":1}), 
-                 ("M","B",{"weight":1}),
-                 ("M","P",{"weight":1}),
-                 ("B","A",{"weight":1}),
-                 ("P","L",{"weight":1}),
-                 ("R","Rm",{"weight":1}),
-                 ("A","R",{"weight":1}),
-                 ("A","Rm",{"weight":1}),
-                 ("L","A",{"weight":1}),
-                 ("L","Am",{"weight":1}),
-	     	 ("Am","R",{"weight":1}), 
-                 ("Am","Rm",{"weight":1}),
-                 ("Lm","Am",{"weight":1})
+
+    	edges = [("C", "M",  {"weight":1}), 
+                 ("M","B",   {"weight":1}),
+                 ("M","P",   {"weight":1}),
+                 ("B","A",   {"weight":1}),
+                 ("P","L",   {"weight":1}),
+                 ("P","Lm",  {"weight":1}),
+                 ("R","Rm",  {"weight":1}),
+                 ("R","M",   {"weight":1}),
+                 ("A","R",   {"weight":1}),
+                 ("A","Rm",  {"weight":1}),
+                 ("L","A",   {"weight":1}),
+                 ("L","Am",  {"weight":1}),
+	     	 ("Am","R",  {"weight":1}), 
+	     	 ("R","Rm",  {"weight":1}), 
+                 ("Am","Rm", {"weight":1}),
+	     	 ("Rm","M",  {"weight":1}), 
+                 ("Lm","Am", {"weight":1})
             	]
     	X.add_edges_from(edges)
 
     	self.labelMap = {
-            "M" : 0, "P" : 1, "B" : 2, "C" : 3,
-            "R" : 4, "Rm" : 5, "A" : 6, "Am" : 7,
-            "L" : 8, "Lm" : 9
+            "M"  : 0, 
+            "P"  : 1, 
+            "B"  : 2, 
+            "C"  : 3,
+            "R"  : 4, 
+            "Rm" : 5, 
+            "A"  : 6, 
+            "Am" : 7,
+            "L"  : 8, 
+            "Lm" : 9
         }
+
+        n = len(self.labelMap)
+
+        for i in range(0, n) :
+            self.iMap.append([])
+
+        i = self.labelMap
+
+        self.iMap[ i["M"] ]  = [ i["C"], i["R"], i["Rm"] ]
+        self.iMap[ i["P"] ]  = [ i["M"] ]
+        self.iMap[ i["B"] ]  = [ i["M"] ]
+        self.iMap[ i["C"] ]  = [  ]
+        self.iMap[ i["R"] ]  = [ i["A"], i["Am"] ]
+        self.iMap[ i["Rm"] ] = [ i["A"], i["Am"], i["R"] ]
+        self.iMap[ i["A"] ]  = [ i["L"], i["B"] ]
+        self.iMap[ i["Am"] ] = [ i["L"], i["Lm"] ]
+        self.iMap[ i["L"] ]  = [ i["P"] ]
+        self.iMap[ i["Lm"] ] = [ i["P"] ]
+
+#        print "iMap", len(self.labelMap), self.iMap
 
     	return nx.DiGraph(nx.relabel_nodes(X,self.labelMap))  
 
  
-    def fM(self, g, s, indexList, i):
+    def fM(self, g, s, indexList, i) :
         i = self.labelMap
-        image = s[ i["C"] ].x and not s[ i["R"] ].x and not s[ i["Rm"] ].x
-        return state.State(image)
+        image =  s[ i["C"] ].x and not s[ i["R"] ].x and not s[ i["Rm"] ].x
+        return state.State(int(image), 2)
 
-    def fP(self, g, s, indexList, i):
-        i = self.labelMap
-        image = s[ i["M"] ].x 
-        return state.State(image)
-
-    def fB(self, g, s, indexList, i):
+    def fP(self, g, s, indexList, i) :
         i = self.labelMap
         image = s[ i["M"] ].x 
-        return state.State(image)
+        return state.State(int(image))
 
-    def fC(self, g, s, indexList, i):
+    def fB(self, g, s, indexList, i) :
         i = self.labelMap
-        image = not Ge
-        return state.State(image)
+        image = s[ i["M"] ].x 
+        return state.State(int(image))
 
-    def fR(self, g, s, indexList, i):
+    def fC(self, g, s, indexList, i) :
+        i = self.labelMap
+        image = not self.Ge
+        return state.State(int(image))
+
+    def fR(self, g, s, indexList, i) :
         i = self.labelMap
         image = not s[ i["A"] ].x and not s[ i["Am"] ].x
-        return state.State(image)
+        return state.State(int(image))
 
-    def fRm(self, g, s, indexList, i):
+    def fRm(self, g, s, indexList, i) :
         i = self.labelMap
         image = (not s[ i["A"] ].x and not s[ i["Am"] ].x) or not s[ i["R"] ].x
-        return state.State(image)
+        return state.State(int(image))
 
     def fA(self, g, s, indexList, i):
         i = self.labelMap
-        image = s[ i["L"] ].x and s[ i["B"] ]
-        return state.State(image)
+        image = s[ i["L"] ].x and s[ i["B"] ].x
+        return state.State(int(image))
 
     def fAm(self, g, s, indexList, i):
         i = self.labelMap
-        image = s[ i["L"] ].x or s[ i["Lm"] ]
-        return state.State(image)
+        image = s[ i["L"] ].x or s[ i["Lm"] ].x
+        return state.State(int(image))
 
     def fL(self, g, s, indexList, i):
         i = self.labelMap
         image = s[ i["P"] ].x and self.Le and not self.Ge
-        return state.State(image)
+        return state.State(int(image))
 
     def fLm(self, g, s, indexList, i):
         i = self.labelMap
         image = ( (self.Lem and s[ i["P"] ].x) or self.Le ) and not self.Ge
-        return state.State(image)
+        return state.State(int(image))
 
 
     def SetFunctionList(self) :
-	f = [fM, fP, fB, fC, fR, fRm, fA, fAm, fL, fLm]
+	f = [self.fM, self.fP, self.fB, self.fC, self.fR, 
+             self.fRm, self.fA, self.fAm, self.fL, self.fLm]
 	return f
     
     def GetGraph(self) :
@@ -134,6 +181,19 @@ class LacOperon() :
     
     def GetDomain(self) :
 	return self.domain
+
+    def ConstructGDS(self) :
+
+        n = nx.number_of_nodes(self.g)
+        stateObject = n * [gds.state.State(0, 2)]
+
+        gds1 = gds.GDS(self.g, self.f, stateObject)
+        gds1.iMap = self.iMap
+        gds1.SetParallel()
+        self.F = gds1
+
+        return self.F
+
 
 
 class MendozaAlvarezBuylla() :
@@ -402,6 +462,7 @@ class generalizedThreshold :
         return state.State( 0 if sum < self.k else 1, 2)
 
 def main() :
+
     M = MendozaAlvarezBuylla()
     X = M.GetGraph()
     activity = list()
