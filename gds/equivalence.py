@@ -197,6 +197,7 @@ def KappaBarClasses(graph, autX, kappaEqClasses = None) :
     components = networkx.connected_components(X)
 
     for component in components :
+        print "Type of index:", type(component)
         index = component[0]
         barClasses.append( kappaEqClasses[index][0] )
 

@@ -54,6 +54,10 @@ def main() :
 #    print transitions
  
     p = gds.phase_space.PhaseSpace(F)
+
+    print p.GetComponents()
+
+
     T = p.GetTransitions()
 
     fixedPoints = p.GetFixedPoints()
