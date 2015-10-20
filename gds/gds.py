@@ -12,7 +12,8 @@ import graph_algorithms
 import functions
 
 class GDS :
-    def __init__(self, g, f, stateObjectList, circleFlag = False) :
+    def __init__(self, g, f, stateObjectList, circleFlag = False, iMap = None) :
+        self.iMap = iMap
         self.stateObjectList = None
         self.tupleConverter = None
         self.SetGraph(g, stateObjectList, circleFlag)
@@ -28,11 +29,14 @@ class GDS :
 
     def SetGraph(self, g, stateObjectList, circleFlag = False) :
         self.g = g
-        self.iMap = graph_algorithms.CreateIndexMap(g)
-        self.dim = len( self.g.nodes() )
-        if circleFlag == True : # rearrange some ...
-            self.iMap[0] = [self.dim-1, 0, 1]
-            self.iMap[self.dim-1] = [self.dim-2, self.dim-1, 0]
+
+        if self.iMap == None :
+            self.iMap = graph_algorithms.CreateIndexMap(g)
+            self.dim = len( self.g.nodes() )
+            if circleFlag == True : # rearrange some ...
+                self.iMap[0] = [self.dim-1, 0, 1]
+                self.iMap[self.dim-1] = [self.dim-2, self.dim-1, 0]
+
         self.SetStateObjectList(stateObjectList)
 
     def SetStateObjectList(self, stateObjectList) :

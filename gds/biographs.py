@@ -112,8 +112,8 @@ class LacOperon() :
 
  
     def fM(self, g, s, indexList, i) :
-        i = self.labelMap
-        image =  s[ i["C"] ].x and not s[ i["R"] ].x and not s[ i["Rm"] ].x
+        i = self.iMap["M"]
+        image =  s[ i[0] ].x and not s[ i[1] ].x and not s[ i[2] ].x
         return state.State(int(image), 2)
 
     def fP(self, g, s, indexList, i) :
@@ -187,7 +187,8 @@ class LacOperon() :
         n = nx.number_of_nodes(self.g)
         stateObject = n * [gds.state.State(0, 2)]
 
-        gds1 = gds.GDS(self.g, self.f, stateObject)
+        gds1 = gds.GDS(circleFlag = False, g = self.g, f = self.f, 
+                       stateObject = stateObject, iMap = self.iMap)
         gds1.iMap = self.iMap
         gds1.SetParallel()
         self.F = gds1
