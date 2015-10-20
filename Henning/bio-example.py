@@ -112,8 +112,9 @@ def main() :
     m = nx.number_of_edges(g)
 
     F = lacOperon.F
-    F.SetSequence([0,1,2,3,4,5,6,7,8,9])
-    lacOperon.SetParams(Ge = 0, Le = 0, Lem = 0)
+    #F.SetSequence([0,1,2,3,4,5,6,7,8,9])
+    F.SetParallel()
+    lacOperon.SetParams(Ge = 0, Le = 0, Lem = 1)
 
 #    transitions = gds.algorithms.GenerateTransitions(F)
 #    print transitions
