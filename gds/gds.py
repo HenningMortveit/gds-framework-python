@@ -29,10 +29,10 @@ class GDS :
 
     def SetGraph(self, g, stateObjectList, circleFlag = False) :
         self.g = g
+        self.dim = len( self.g.nodes() )
 
         if self.iMap == None :
             self.iMap = graph_algorithms.CreateIndexMap(g)
-            self.dim = len( self.g.nodes() )
             if circleFlag == True : # rearrange some ...
                 self.iMap[0] = [self.dim-1, 0, 1]
                 self.iMap[self.dim-1] = [self.dim-2, self.dim-1, 0]
