@@ -190,10 +190,7 @@ class LacOperon() :
 
         gds1 = gds.GDS(circleFlag = False, g = self.g, f = self.f, 
                        stateObjectList = stateObject, iMap = self.iMap)
-        self.F = gds1
-
-        return self.F
-
+        return gds1
 
 
 class MendozaAlvarezBuylla() :

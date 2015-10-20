@@ -104,7 +104,7 @@ def HammingNorm(x) :
 
 def main() :
 
-    lacOperon = gds.biographs.LacOperon(0, 0, 0)
+    lacOperon = gds.biographs.LacOperon(0, 1, 1)
 
     g = lacOperon.GetGraph()
     f = lacOperon.GetFunctionList()
@@ -113,7 +113,7 @@ def main() :
 
     F = lacOperon.F
     F.SetSequence([0,1,2,3,4,5,6,7,8,9])
-    lacOperon.SetParams(Ge = 1, Le = 1, Lem = 1)
+    lacOperon.SetParams(Ge = 0, Le = 0, Lem = 0)
 
 #    transitions = gds.algorithms.GenerateTransitions(F)
 #    print transitions
