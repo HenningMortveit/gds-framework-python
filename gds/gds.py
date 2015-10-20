@@ -37,6 +37,9 @@ class GDS :
                 self.iMap[0] = [self.dim-1, 0, 1]
                 self.iMap[self.dim-1] = [self.dim-2, self.dim-1, 0]
 
+#        else :
+#           construct the graph g using the iMaps.            
+
         self.SetStateObjectList(stateObjectList)
 
     def SetStateObjectList(self, stateObjectList) :

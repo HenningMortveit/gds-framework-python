@@ -117,48 +117,47 @@ class LacOperon() :
         return state.State(int(image), 2)
 
     def fP(self, g, s, indexList, i) :
-        i = self.labelMap
-        image = s[ i["M"] ].x 
+        i = self.iMap["P"]
+        image = s[ i[0] ].x 
         return state.State(int(image))
 
     def fB(self, g, s, indexList, i) :
-        i = self.labelMap
-        image = s[ i["M"] ].x 
+        i = self.iMap["B"]
+        image = s[ i[0] ].x 
         return state.State(int(image))
 
     def fC(self, g, s, indexList, i) :
-        i = self.labelMap
         image = not self.Ge
         return state.State(int(image))
 
     def fR(self, g, s, indexList, i) :
-        i = self.labelMap
-        image = not s[ i["A"] ].x and not s[ i["Am"] ].x
+        i = self.iMap["R"]
+        image = not s[ i[0] ].x and not s[ i[1] ].x
         return state.State(int(image))
 
     def fRm(self, g, s, indexList, i) :
-        i = self.labelMap
-        image = (not s[ i["A"] ].x and not s[ i["Am"] ].x) or not s[ i["R"] ].x
+        i = self.iMap["Rm"]
+        image = (not s[ i[0] ].x and not s[ i[1] ].x) or not s[ i[2] ].x
         return state.State(int(image))
 
     def fA(self, g, s, indexList, i):
-        i = self.labelMap
-        image = s[ i["L"] ].x and s[ i["B"] ].x
+        i = self.iMap["A"]
+        image = s[ i[0] ].x and s[ i[1] ].x
         return state.State(int(image))
 
     def fAm(self, g, s, indexList, i):
-        i = self.labelMap
-        image = s[ i["L"] ].x or s[ i["Lm"] ].x
+        i = self.iMap["Am"]
+        image = s[ i[0] ].x or s[ i[1] ].x
         return state.State(int(image))
 
     def fL(self, g, s, indexList, i):
-        i = self.labelMap
-        image = s[ i["P"] ].x and self.Le and not self.Ge
+        i = self.iMap["L"]
+        image = s[ i[0] ].x and self.Le and not self.Ge
         return state.State(int(image))
 
     def fLm(self, g, s, indexList, i):
-        i = self.labelMap
-        image = ( (self.Lem and s[ i["P"] ].x) or self.Le ) and not self.Ge
+        i = self.iMap["Lm"]
+        image = ( (self.Lem and s[ i[0] ].x) or self.Le ) and not self.Ge
         return state.State(int(image))
 
 
