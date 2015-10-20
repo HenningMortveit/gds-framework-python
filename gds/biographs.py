@@ -106,23 +106,25 @@ class LacOperon() :
         self.iMap[ i["L"] ]  = [ i["P"] ]
         self.iMap[ i["Lm"] ] = [ i["P"] ]
 
+        print self.iMap
+
 #        print "iMap", len(self.labelMap), self.iMap
 
     	return nx.DiGraph(nx.relabel_nodes(X,self.labelMap))  
 
  
     def fM(self, g, s, indexList, i) :
-        i = self.iMap["M"]
-        image =  s[ i[0] ].x and not s[ i[1] ].x and not s[ i[2] ].x
+        i = indexList # self.iMap[ self.labelMap["M"] ]
+        image =  s[ i[0] ].x and (not s[ i[1] ].x) and (not s[ i[2] ].x)
         return state.State(int(image), 2)
 
     def fP(self, g, s, indexList, i) :
-        i = self.iMap["P"]
+        i = indexList #  self.iMap[self.labelMap["P"] ]
         image = s[ i[0] ].x 
         return state.State(int(image))
 
     def fB(self, g, s, indexList, i) :
-        i = self.iMap["B"]
+        i =  indexList # self.iMap[ self.labelMap["B"] ]
         image = s[ i[0] ].x 
         return state.State(int(image))
 
@@ -131,33 +133,33 @@ class LacOperon() :
         return state.State(int(image))
 
     def fR(self, g, s, indexList, i) :
-        i = self.iMap["R"]
-        image = not s[ i[0] ].x and not s[ i[1] ].x
+        i = indexList #  self.iMap[ self.labelMap["R"] ]
+        image = (not s[ i[0] ].x) and (not s[ i[1] ].x)
         return state.State(int(image))
 
     def fRm(self, g, s, indexList, i) :
-        i = self.iMap["Rm"]
-        image = (not s[ i[0] ].x and not s[ i[1] ].x) or not s[ i[2] ].x
+        i = indexList #  self.iMap[ self.labelMap["Rm"] ]
+        image = ((not s[ i[0] ].x) and (not s[ i[1] ].x)) or (not s[ i[2] ].x)
         return state.State(int(image))
 
     def fA(self, g, s, indexList, i):
-        i = self.iMap["A"]
+        i = indexList #  self.iMap[ self.labelMap["A"] ]
         image = s[ i[0] ].x and s[ i[1] ].x
         return state.State(int(image))
 
     def fAm(self, g, s, indexList, i):
-        i = self.iMap["Am"]
+        i = indexList #  self.iMap[ self.labelMap["Am"] ]
         image = s[ i[0] ].x or s[ i[1] ].x
         return state.State(int(image))
 
     def fL(self, g, s, indexList, i):
-        i = self.iMap["L"]
-        image = s[ i[0] ].x and self.Le and not self.Ge
+        i = indexList #  self.iMap[ self.labelMap["L"] ]
+        image = s[ i[0] ].x and self.Le and (not self.Ge)
         return state.State(int(image))
 
     def fLm(self, g, s, indexList, i):
-        i = self.iMap["Lm"]
-        image = ( (self.Lem and s[ i[0] ].x) or self.Le ) and not self.Ge
+        i = indexList #  self.iMap[ self.labelMap["Lm"] ]
+        image = ( (self.Lem and s[ i[0] ].x) or self.Le ) and (not self.Ge)
         return state.State(int(image))
 
 
@@ -187,9 +189,7 @@ class LacOperon() :
         stateObject = n * [gds.state.State(0, 2)]
 
         gds1 = gds.GDS(circleFlag = False, g = self.g, f = self.f, 
-                       stateObject = stateObject, iMap = self.iMap)
-        gds1.iMap = self.iMap
-        gds1.SetParallel()
+                       stateObjectList = stateObject, iMap = self.iMap)
         self.F = gds1
 
         return self.F

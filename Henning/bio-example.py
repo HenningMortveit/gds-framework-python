@@ -112,6 +112,8 @@ def main() :
     m = nx.number_of_edges(g)
 
     F = lacOperon.F
+    F.SetSequence([0,1,2,3,4,5,6,7,8,9])
+    lacOperon.SetParams(Ge = 1, Le = 1, Lem = 1)
 
 #    transitions = gds.algorithms.GenerateTransitions(F)
 #    print transitions
@@ -132,6 +134,16 @@ def main() :
     nStates = ng.Num()
 
     print n, nStates
+
+    cNum = 0
+    for cycle in periodicPoints :
+        print "Cycle <%i>:" % cNum
+        for xIndex in cycle :
+            print "\t", F.tupleConverter.IndexToTuple( xIndex )
+        cNum += 1
+
+
+    sys.exit(0)
 
     x = n*[0]
     y = n*[0]
