@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import gds
 import state
 import functions
+import sys
 
 import Activity
 
@@ -51,7 +52,7 @@ class LacOperon() :
 
     def CreateGraph(self) :
 
-        self.iMap = []   # index map as for GDS
+        self.iMap = dict()   # index map as for GDS
 
     	X = nx.DiGraph()
 
@@ -90,8 +91,8 @@ class LacOperon() :
 
         n = len(self.labelMap)
 
-        for i in range(0, n) :
-            self.iMap.append([])
+        #for i in range(0, n) :
+        #    self.iMap.append([])
 
         i = self.labelMap
 
@@ -486,7 +487,7 @@ def main() :
     f = lacOperon.GetFunctionList()
     iMap = lacOperon.GetIMap()
     
-    print "activity 0:", Activity.Activity(X, f, 0, iMap)
+    print "activity 0:", Activity.Activity(X, f, 0, iMap).GetActivity()
     
     sys.exit(0)
     

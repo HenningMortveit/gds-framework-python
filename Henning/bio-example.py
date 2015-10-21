@@ -2,9 +2,9 @@
 #import pygraphviz as pgv
 
 import sys
-#sys.path += ["/Users/henning/git/gds"]
+sys.path += ["/Users/henning/git/gds"]
 sys.path += ["/Users/Sichao/gitlab/gds"]
-
+sys.path += ["/home/sichao/gitlab/gds"]
 import gds.util.enumeration
 import gds.state
 import gds.graphs

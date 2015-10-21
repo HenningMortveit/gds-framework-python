@@ -123,9 +123,11 @@ class Activity :
         if isinstance(self.func,list) : #non-uniform functions
             if self.iMap != None : #reset iMap
                 self.sgIMap = dict()
+                print self.iMap
                 for node in self.iMap :
+                    print node
                     sgNode = self.labelMap[node]
-                    sgNeighors = list()
+                    sgNeighbors = list()
                     for neighbors in self.iMap[node] :
                         sgNeighbors.append(self.labelMap[neighbors])
                     self.sgIMap[sgNode] = sgNeighbors
