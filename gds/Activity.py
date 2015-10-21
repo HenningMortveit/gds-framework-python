@@ -43,6 +43,7 @@ class Activity :
         self.iNode = iNode
         self.func = f
         self.iMap = copy.deepcopy(iMap)
+        self.sgIMap = None
         self.labelMap = dict()
         self.reverseLabelMap = dict()
         if networkx.is_directed(g) :
