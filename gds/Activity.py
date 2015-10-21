@@ -117,25 +117,26 @@ class Activity :
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
-        if isinstance(self.func,list) : #non-uniform functions
-            if self.iMap != None : #reset iMap such that it only contains the nodes in the subgraph
-                self.sgIMap = dict()
-                for node in self.graph.nodes():
-                    if not self.subgraph.has_node(node) : #remove the node not in the subgraph from iMap
-                        self.iMap.pop(node)
-                for node in self.iMap : #remove neighbors not in the subgraph for each node in iMap
-                    newNeighborList = list()
-                    for neighbor in self.iMap[node] :
-                        if self.subgraph.has_node(neighbor) :
-                            newNeighborList.append(neighbor)
-                    self.iMap[node] = newNeighborList
+        if self.iMap != None : #reset iMap such that it only contains the nodes in the subgraph
+            self.sgIMap = dict()
+            for node in self.graph.nodes():
+                if not self.subgraph.has_node(node) : #remove the node not in the subgraph from iMap
+                    self.iMap.pop(node)
+            for node in self.iMap : #remove neighbors not in the subgraph for each node in iMap
+                newNeighborList = list()
+                for neighbor in self.iMap[node] :
+                    if self.subgraph.has_node(neighbor) :
+                        newNeighborList.append(neighbor)
+                self.iMap[node] = newNeighborList
 
-                for node in self.iMap : #maping the indices from the original graph to the subgraph for iMap
-                    sgNode = self.labelMap[node]
-                    sgNeighbors = list()
-                    for neighbor in self.iMap[node] :
-                        sgNeighbors.append(self.labelMap[neighbor])
-                    self.sgIMap[sgNode] = sgNeighbors
+            for node in self.iMap : #maping the indices from the original graph to the subgraph for iMap
+                sgNode = self.labelMap[node]
+                sgNeighbors = list()
+                for neighbor in self.iMap[node] :
+                    sgNeighbors.append(self.labelMap[neighbor])
+                self.sgIMap[sgNode] = sgNeighbors
+
+        if isinstance(self.func,list) : #non-uniform functions
             function = list()
             for i in range(n):
                 function.append(self.func[self.reverseLabelMap[i]]) #find the corresponding vertex function from the original function list
