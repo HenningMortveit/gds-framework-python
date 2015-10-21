@@ -182,6 +182,9 @@ class LacOperon() :
     def GetDomain(self) :
 	return self.domain
 
+    def GetIMap(self) :
+        return self.iMap
+
     def ConstructGDS(self) :
 
         n = nx.number_of_nodes(self.g)
@@ -463,6 +466,15 @@ class generalizedThreshold :
         return state.State( 0 if sum < self.k else 1, 2)
 
 def main() :
+    lacOperon = LacOperon(0, 0, 0)
+    X = lacOperon.GetGraph()
+    f = lacOperon.GetFunctionList()
+    iMap = lacOperon.GetIMap()
+    
+    print "activity 0:", Activity.Activity(X, f, 0, iMap)
+    
+    sys.exit(0)
+    
 
     M = MendozaAlvarezBuylla()
     X = M.GetGraph()

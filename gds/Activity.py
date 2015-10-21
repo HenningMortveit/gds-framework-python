@@ -37,10 +37,11 @@ import equivalence
 import matplotlib.pyplot as plt
 
 class Activity :
-    def __init__(self, g, f, iNode) :
+    def __init__(self, g, f, iNode, iMap=None) :
         self.graph = g
         self.iNode = iNode
         self.func = f
+        self.iMap = iMap
         self.labelMap = dict()
         self.reverseLabelMap = dict()
         if networkx.is_directed(g) :
@@ -84,8 +85,8 @@ class Activity :
         self.iNode = 0
     
     def SetDiSubgraph(self) :
-        """Directed version of Setsubgraph"""
-	"""Extract the distance-2 subgraph X(i;2)"""
+        """Directed version of Setsubgraph
+	    Extract the distance-2 subgraph X(i;2)"""
         self.n1 = self.graph.neighbors(self.iNode) + self.graph.predecessors(self.iNode)
         self.n2 = list()
         for node in self.n1 :
@@ -120,13 +121,21 @@ class Activity :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
         if isinstance(self.func,list) : #non-uniform functions
+            if self.iMap != None : #reset iMap
+                self.sgIMap = dict()
+                for node in self.iMap :
+                    sgNode = self.labelMap[node]
+                    sgNeighors = list()
+                    for neighbors in self.iMap[node] :
+                        sgNeighbors.append(self.labelMap[neighbors])
+                    self.sgIMap[sgNode] = sgNeighbors
             function = list()
             for i in range(n):
                 function.append(self.func[self.reverseLabelMap[i]]) #find the corresponding vertex function from the original function list
         else:  #uniform founctions
             function = n * [self.func]
     	stateObject = n * [gds.state.State(0, 2)]
-    	self.gds = gds.GDS(self.sg, function, stateObject, False)
+    	self.gds = gds.GDS(self.sg, function, stateObject, False, self.sgIMap)
 
     def ComputeActivity(self):
         """Compute alpha_{F,i}"""
@@ -212,7 +221,7 @@ class Activity :
 	self.acycNumber = len(acyc)
         return self.acycNumber
     
-def main() :
+def main() : 
     #networkx.draw(X, pos = networkx.spring_layout(X))
     #plt.show()
 
