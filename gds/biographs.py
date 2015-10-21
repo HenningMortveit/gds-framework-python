@@ -107,7 +107,7 @@ class LacOperon() :
         self.iMap[ i["L"] ]  = [ i["P"] ]
         self.iMap[ i["Lm"] ] = [ i["P"] ]
 
-        print self.iMap
+        #print self.iMap
 
 #        print "iMap", len(self.labelMap), self.iMap
 
@@ -482,14 +482,17 @@ class generalizedThreshold :
         return state.State( 0 if sum < self.k else 1, 2)
 
 def main() :
-    lacOperon = LacOperon(0, 0, 0)
+    lacOperon = LacOperon(1, 0, 0)
     X = lacOperon.GetGraph()
+    activity = list()
     f = lacOperon.GetFunctionList()
-    iMap = lacOperon.GetIMap()
-    
-    print "activity 0:", Activity.Activity(X, f, 0, iMap).GetActivity()
-    
-    sys.exit(0)
+    for node in X.nodes():
+        iMap = lacOperon.GetIMap()
+        A = Activity.Activity(X, f, node, iMap)
+        activity.append(A.GetActivity())
+    print "activity:", activity
+    sys.exit(0)  
+
     
 
     M = MendozaAlvarezBuylla()

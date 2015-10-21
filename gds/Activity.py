@@ -30,6 +30,7 @@ import os
 import sys
 import math
 import gds
+import copy
 import algorithms
 import graphs
 import networkx
@@ -41,7 +42,7 @@ class Activity :
         self.graph = g
         self.iNode = iNode
         self.func = f
-        self.iMap = iMap
+        self.iMap = copy.deepcopy(iMap)
         self.labelMap = dict()
         self.reverseLabelMap = dict()
         if networkx.is_directed(g) :
@@ -79,8 +80,6 @@ class Activity :
             self.labelMap[node] = l
             self.reverseLabelMap[l] = node
             l = l + 1
-        #print self.labelMap
-        #print self.reverseLabelMap
         self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
         self.iNode = 0
     
@@ -112,8 +111,6 @@ class Activity :
             self.labelMap[node] = l
             self.reverseLabelMap[l] = node
             l = l + 1
-        #print self.labelMap
-        #print self.reverseLabelMap
         self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
         self.iNode = 0
 
@@ -121,15 +118,23 @@ class Activity :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
         if isinstance(self.func,list) : #non-uniform functions
-            if self.iMap != None : #reset iMap
+            if self.iMap != None : #reset iMap such that it only contains the nodes in the subgraph
                 self.sgIMap = dict()
-                print self.iMap
-                for node in self.iMap :
-                    print node
+                for node in self.graph.nodes():
+                    if not self.subgraph.has_node(node) : #remove the node not in the subgraph from iMap
+                        self.iMap.pop(node)
+                for node in self.iMap : #remove neighbors not in the subgraph for each node in iMap
+                    newNeighborList = list()
+                    for neighbor in self.iMap[node] :
+                        if self.subgraph.has_node(neighbor) :
+                            newNeighborList.append(neighbor)
+                    self.iMap[node] = newNeighborList
+
+                for node in self.iMap : #maping the indices from the original graph to the subgraph for iMap
                     sgNode = self.labelMap[node]
                     sgNeighbors = list()
-                    for neighbors in self.iMap[node] :
-                        sgNeighbors.append(self.labelMap[neighbors])
+                    for neighbor in self.iMap[node] :
+                        sgNeighbors.append(self.labelMap[neighbor])
                     self.sgIMap[sgNode] = sgNeighbors
             function = list()
             for i in range(n):
