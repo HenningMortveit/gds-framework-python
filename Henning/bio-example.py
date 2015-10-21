@@ -2,7 +2,8 @@
 #import pygraphviz as pgv
 
 import sys
-sys.path += ["/Users/henning/git/gds"]
+#sys.path += ["/Users/henning/git/gds"]
+sys.path += ["/Users/Sichao/gitlab/gds"]
 
 import gds.util.enumeration
 import gds.state
@@ -104,7 +105,7 @@ def HammingNorm(x) :
 
 def main() :
 
-    lacOperon = gds.biographs.LacOperon(0, 0, 0)
+    lacOperon = gds.biographs.LacOperon(0, 1, 1)
 
     g = lacOperon.GetGraph()
     f = lacOperon.GetFunctionList()
@@ -112,6 +113,9 @@ def main() :
     m = nx.number_of_edges(g)
 
     F = lacOperon.F
+    #F.SetSequence([0,1,2,3,4,5,6,7,8,9])
+    F.SetParallel()
+    lacOperon.SetParams(Ge = 0, Le = 0, Lem = 1)
 
 #    transitions = gds.algorithms.GenerateTransitions(F)
 #    print transitions
@@ -121,8 +125,8 @@ def main() :
 
     fixedPoints = p.GetFixedPoints()
     periodicPoints = p.GetPeriodicPoints()
-    print fixedPoints
-    print periodicPoints
+    print "fixed points:", fixedPoints
+    print "periodicPoints:", periodicPoints
    
 
     n = F.GetDim();
@@ -132,6 +136,16 @@ def main() :
     nStates = ng.Num()
 
     print n, nStates
+
+    cNum = 0
+    for cycle in periodicPoints :
+        print "Cycle <%i>:" % cNum
+        for xIndex in cycle :
+            print "\t", F.tupleConverter.IndexToTuple( xIndex )
+        cNum += 1
+
+
+    sys.exit(0)
 
     x = n*[0]
     y = n*[0]
