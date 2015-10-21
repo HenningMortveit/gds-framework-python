@@ -67,12 +67,12 @@ class LacOperon() :
                  ("A","Rm",  {"weight":1}),
                  ("L","A",   {"weight":1}),
                  ("L","Am",  {"weight":1}),
-	     	 ("Am","R",  {"weight":1}), 
-	     	 ("R","Rm",  {"weight":1}), 
+	     	 ("Am","R",  {"weight":1}),
                  ("Am","Rm", {"weight":1}),
 	     	 ("Rm","M",  {"weight":1}), 
                  ("Lm","Am", {"weight":1})
             	]
+        
     	X.add_edges_from(edges)
 
     	self.labelMap = {
@@ -147,7 +147,7 @@ class LacOperon() :
 
     def fRm(self, g, s, indexList, i) :
         i = indexList #  self.iMap[ self.labelMap["Rm"] ]
-        image = ((not s[ i[0] ].x) and (not s[ i[1] ].x)) or (not s[ i[2] ].x)
+        image = ((not s[ i[0] ].x) and (not s[ i[1] ].x)) or (s[ i[2] ].x)
         #i = self.labelMap
         #image = ((not s[ i["A"] ].x) and (not s[ i["Am"] ].x)) or (not s[ i["R"] ].x)
         return state.State(int(image))

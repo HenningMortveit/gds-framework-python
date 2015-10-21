@@ -2,7 +2,8 @@
 #import pygraphviz as pgv
 
 import sys
-sys.path += ["/Users/henning/git/gds"]
+#sys.path += ["/Users/henning/git/gds"]
+sys.path += ["/Users/Sichao/gitlab/gds"]
 
 import gds.util.enumeration
 import gds.state
@@ -124,8 +125,8 @@ def main() :
 
     fixedPoints = p.GetFixedPoints()
     periodicPoints = p.GetPeriodicPoints()
-    print fixedPoints
-    print periodicPoints
+    print "fixed points:", fixedPoints
+    print "periodicPoints:", periodicPoints
    
 
     n = F.GetDim();
