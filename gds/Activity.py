@@ -30,6 +30,7 @@ import os
 import sys
 import math
 import gds
+import copy
 import algorithms
 import graphs
 import networkx
@@ -37,10 +38,12 @@ import equivalence
 import matplotlib.pyplot as plt
 
 class Activity :
-    def __init__(self, g, f, iNode) :
+    def __init__(self, g, f, iNode, iMap=None) :
         self.graph = g
         self.iNode = iNode
         self.func = f
+        self.iMap = copy.deepcopy(iMap)
+        self.sgIMap = None
         self.labelMap = dict()
         self.reverseLabelMap = dict()
         if networkx.is_directed(g) :
@@ -78,14 +81,12 @@ class Activity :
             self.labelMap[node] = l
             self.reverseLabelMap[l] = node
             l = l + 1
-        #print self.labelMap
-        #print self.reverseLabelMap
         self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
         self.iNode = 0
     
     def SetDiSubgraph(self) :
-        """Directed version of Setsubgraph"""
-	"""Extract the distance-2 subgraph X(i;2)"""
+        """Directed version of Setsubgraph
+	    Extract the distance-2 subgraph X(i;2)"""
         self.n1 = self.graph.neighbors(self.iNode) + self.graph.predecessors(self.iNode)
         self.n2 = list()
         for node in self.n1 :
@@ -111,14 +112,31 @@ class Activity :
             self.labelMap[node] = l
             self.reverseLabelMap[l] = node
             l = l + 1
-        #print self.labelMap
-        #print self.reverseLabelMap
         self.sg = networkx.Graph(networkx.relabel_nodes(self.subgraph,self.labelMap))
         self.iNode = 0
 
     def SetGDS(self) :
 	"""Set up the GDS of X(i;2)"""
         n = len(self.sg.nodes())
+        if self.iMap != None : #reset iMap such that it only contains the nodes in the subgraph
+            self.sgIMap = dict()
+            for node in self.graph.nodes():
+                if not self.subgraph.has_node(node) : #remove the node not in the subgraph from iMap
+                    self.iMap.pop(node)
+            for node in self.iMap : #remove neighbors not in the subgraph for each node in iMap
+                newNeighborList = list()
+                for neighbor in self.iMap[node] :
+                    if self.subgraph.has_node(neighbor) :
+                        newNeighborList.append(neighbor)
+                self.iMap[node] = newNeighborList
+
+            for node in self.iMap : #maping the indices from the original graph to the subgraph for iMap
+                sgNode = self.labelMap[node]
+                sgNeighbors = list()
+                for neighbor in self.iMap[node] :
+                    sgNeighbors.append(self.labelMap[neighbor])
+                self.sgIMap[sgNode] = sgNeighbors
+
         if isinstance(self.func,list) : #non-uniform functions
             function = list()
             for i in range(n):
@@ -126,7 +144,7 @@ class Activity :
         else:  #uniform founctions
             function = n * [self.func]
     	stateObject = n * [gds.state.State(0, 2)]
-    	self.gds = gds.GDS(self.sg, function, stateObject, False)
+    	self.gds = gds.GDS(self.sg, function, stateObject, False, self.sgIMap)
 
     def ComputeActivity(self):
         """Compute alpha_{F,i}"""
@@ -212,7 +230,7 @@ class Activity :
 	self.acycNumber = len(acyc)
         return self.acycNumber
     
-def main() :
+def main() : 
     #networkx.draw(X, pos = networkx.spring_layout(X))
     #plt.show()
 

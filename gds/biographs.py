@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import gds
 import state
 import functions
+import sys
 
 import Activity
 
@@ -51,7 +52,7 @@ class LacOperon() :
 
     def CreateGraph(self) :
 
-        self.iMap = []   # index map as for GDS
+        self.iMap = dict()   # index map as for GDS
 
     	X = nx.DiGraph()
 
@@ -90,8 +91,8 @@ class LacOperon() :
 
         n = len(self.labelMap)
 
-        for i in range(0, n) :
-            self.iMap.append([])
+        #for i in range(0, n) :
+        #    self.iMap.append([])
 
         i = self.labelMap
 
@@ -106,7 +107,7 @@ class LacOperon() :
         self.iMap[ i["L"] ]  = [ i["P"] ]
         self.iMap[ i["Lm"] ] = [ i["P"] ]
 
-        print self.iMap
+        #print self.iMap
 
 #        print "iMap", len(self.labelMap), self.iMap
 
@@ -200,6 +201,9 @@ class LacOperon() :
     
     def GetDomain(self) :
 	return self.domain
+
+    def GetIMap(self) :
+        return self.iMap
 
     def ConstructGDS(self) :
 
@@ -478,6 +482,18 @@ class generalizedThreshold :
         return state.State( 0 if sum < self.k else 1, 2)
 
 def main() :
+    lacOperon = LacOperon(1, 0, 0)
+    X = lacOperon.GetGraph()
+    activity = list()
+    f = lacOperon.GetFunctionList()
+    for node in X.nodes():
+        iMap = lacOperon.GetIMap()
+        A = Activity.Activity(X, f, node, iMap)
+        activity.append(A.GetActivity())
+    print "activity:", activity
+    sys.exit(0)  
+
+    
 
     M = MendozaAlvarezBuylla()
     X = M.GetGraph()

@@ -3,7 +3,9 @@
 
 import sys
 sys.path += ["/Users/henning/git/gds"]
-#sys.path += ["/Users/Sichao/gitlab/gds"]
+sys.path += ["/Users/Sichao/gitlab/gds"]
+sys.path += ["/home/sichao/gitlab/gds"]
+sys.path += ["/Users/henning/git/gds"]
 
 import gds.util.enumeration
 import gds.state
