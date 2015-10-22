@@ -2,8 +2,8 @@
 #import pygraphviz as pgv
 
 import sys
-#sys.path += ["/Users/henning/git/gds"]
-sys.path += ["/Users/Sichao/gitlab/gds"]
+sys.path += ["/Users/henning/git/gds"]
+#sys.path += ["/Users/Sichao/gitlab/gds"]
 
 import gds.util.enumeration
 import gds.state
@@ -113,8 +113,8 @@ def main() :
     m = nx.number_of_edges(g)
 
     F = lacOperon.F
-    #F.SetSequence([0,1,2,3,4,5,6,7,8,9])
     F.SetParallel()
+    F.SetBlockSequence([ [0,1,2,3,4,6,8,9], [5,7] ])
     lacOperon.SetParams(Ge = 0, Le = 0, Lem = 1)
 
 #    transitions = gds.algorithms.GenerateTransitions(F)
