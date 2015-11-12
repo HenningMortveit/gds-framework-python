@@ -49,6 +49,11 @@ def LinearExtensions(graph) :
 
     m = len( graph.edges() )
 
+    # The empty graph: one linear extension
+    if m == 0 :
+        linExt.append( range(0, graph.number_of_nodes() ) )
+        return linExt
+
     enum = util.enumeration.NTupleGenerator( m * [2] )
     N = enum.Num()
 
