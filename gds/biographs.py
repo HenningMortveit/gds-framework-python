@@ -489,6 +489,7 @@ def main() :
     for node in X.nodes():
         iMap = lacOperon.GetIMap()
         A = Activity.Activity(X, f, node, iMap)
+        A.ComputeActivity()
         activity.append(A.GetActivity())
     print "activity:", activity
     sys.exit(0)  
