@@ -41,7 +41,7 @@ class LacOperon() :
 
         self.SetParams(Ge, Le, Lem)
         self.iMap = []   # index map as for GDS
-        self.g = self.CreateGraph()
+        self.X = self.CreateGraph()
         self.f = self.SetFunctionList()
         self.F = self.ConstructGDS()
 
@@ -111,7 +111,7 @@ class LacOperon() :
 
 #        print "iMap", len(self.labelMap), self.iMap
 
-    	return nx.DiGraph(nx.relabel_nodes(X,self.labelMap))  
+    	return nx.DiGraph(nx.relabel_nodes(X, self.labelMap))  
 
  
     def fM(self, g, s, indexList, i) :
@@ -188,7 +188,7 @@ class LacOperon() :
 	return f
     
     def GetGraph(self) :
-	return self.g
+	return self.X
 	
     def GetFunctionList(self) :
 	return self.f
@@ -207,10 +207,10 @@ class LacOperon() :
 
     def ConstructGDS(self) :
 
-        n = nx.number_of_nodes(self.g)
+        n = nx.number_of_nodes(self.X)
         stateObject = n * [gds.state.State(0, 2)]
 
-        gds1 = gds.GDS(g = self.g, f = self.f, 
+        gds1 = gds.GDS(g = self.X, f = self.f, 
                        stateObjectList = stateObject, 
                        iMap = self.iMap)
         return gds1

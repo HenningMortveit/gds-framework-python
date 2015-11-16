@@ -4,11 +4,14 @@
 import sys
 sys.path += ["/Users/henning/git/gds"]
 
+import itertools
+
 import gds.util.enumeration
 import gds.state
 import gds.graphs
 import gds.functions
 import gds.gds
+import gds.partition
 import gds.algorithms
 import gds.state_algorithms
 import gds.phase_space
@@ -19,6 +22,8 @@ import gds.sequence
 import gds.groups
 
 import gds.biographs
+
+import networkx
 
 def UpdateSequenceEquivalenceExample() :
 
@@ -89,11 +94,23 @@ def UpdateSequenceEquivalenceExample() :
     print ""
 
 
-def main() :
+def BlockUpdateSequenceRepresentatives(G) :
+    """
+    G a graph
+    """
+    T = gds.partition.GenerateBlockSequenceRepresentatives(G)
 
-    UpdateSequenceEquivalenceExample() 
-    return
+    print "# Block sequence representatives:"
+    for l in T :
+        print l
 
+    reps = itertools.chain.from_iterable(T)
+    print "Reps: "
+    for seq in reps :
+        print "\t", seq
+
+
+def LacOperonExample() :
 
     lacOperon = gds.biographs.LacOperon(0, 0, 0)
 
@@ -101,37 +118,44 @@ def main() :
     f = lacOperon.GetFunctionList()
     n = g.size()
 
-    print g
-    print f
-    print n
+#    print g, f, n
 
-    stateObject = n * [gds.state.State(0, 2)]
+    print "Lac Operon system has size: ", n
 
-    gds1 = gds.gds.GDS(g, f, stateObject, False)
+    # stateObject = n * [gds.state.State(0, 2)]
 
-    print gds1
-
-    return
+    gds1 = lacOperon.F # gds.gds.GDS(g, f, stateObject, False)
 
     le = gds.equivalence.LinearExtensions( lacOperon.GetGraph() )
 
     s = list()
 
     for pi in le :
+        print pi
         gds1.SetSequence(pi)
         transitions = gds.algorithms.GenerateTransitions(gds1)
         if not transitions in s :
             s.append(transitions)
 
     print len(s)
-#    p = gds.phase_space.PhaseSpace(gds1)
 
 
+def main() :
+
+    LacOperonExample()
+
+    return
+
+    G = networkx.path_graph(3)
+    BlockUpdateSequenceRepresentatives(G)
+    
+    return
+
+    UpdateSequenceEquivalenceExample() 
+
+    return
 
 
-    sys.exit(0)
-
-    UpdateSequenceEquivalenceExample()
 
 
 # ------------------------------------------------------------

@@ -10,7 +10,7 @@ import itertools
 if __name__ == '__main__' :
     sys.path += ["/Users/henning/git/gds"]
 
-import gds.equivalence
+import equivalence
 import networkx as nx
 
 def ConvertGrowthString(s, labelList, n) :
@@ -202,7 +202,7 @@ def GenerateBlockSequenceRepresentatives(G) :
 
         # Generate update sequence transversal
 
-        linExt = gds.equivalence.LinearExtensions( gMod )
+        linExt = equivalence.LinearExtensions( gMod )
 
         # print "Linear extensions: ", len(linExt)
         # for e in linExt :
