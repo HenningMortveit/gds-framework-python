@@ -121,7 +121,12 @@ class gdsConfig :
         elif self.schedule == "parallel" :
             GDS.SetParallel()
         return GDS    
- 
+    
+    def get_function_list(self) :
+        return self.function_list
+        
+    def get_graph(self) :
+        return self.graph
 
 def main() :
     #X = gds.graphs.CircleGraph(4)
