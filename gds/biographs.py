@@ -11,6 +11,8 @@ import gds
 import state
 import functions
 import sys
+import algorithms
+import phase_space
 
 import Activity
 
@@ -481,7 +483,309 @@ class generalizedThreshold :
 	        sum += s[j].x*g[j][i]['weight']
         return state.State( 0 if sum < self.k else 1, 2)
 
+#class VPC
+class VPC() :
+    """Description:
+
+    HSM: 14 October 2015. Note that if there are modifications or
+    corrections, then iMap and function definitions must be kept
+    consistent. There is no link between them. The same applies to the
+    network.
+
+    """
+
+    def __init__(self) :
+        self.bibtex = """@article{weinstein2015model,
+                          title={A model of the regulatory network involved in the control of the cell cycle and cell differentiation in the Caenorhabditis elegans vulva},
+                          author={Weinstein, Nathan and Ortiz-Guti{\'e}rrez, Elizabeth and Mu{\~n}oz, Stalin and Rosenblueth, David A and {\'A}lvarez-Buylla, Elena R and Mendoza, Luis},
+                          journal={BMC bioinformatics},
+                          volume={16},
+                          number={1},
+                          pages={1},
+                          year={2015},
+                          publisher={BioMed Central}
+                        }
+			"""
+        self.name = "VPC"
+        self.description = "cell cycle and cell differentiation in the Caenorhabditis elegans"
+        self.domain = "biology"
+
+        self.iMap = []   # index map as for GDS
+        self.X = self.CreateGraph()
+        self.f = self.SetFunctionList()
+        self.F = self.ConstructGDS()
+    def CreateGraph(self) :
+
+        self.iMap = dict()   # index map as for GDS
+
+    	X = nx.DiGraph()
+        edges = [("LS", "LIN12i",  {"weight":1}),
+                 ("LIN12i","MPK1",   {"weight":1}),
+                 ("LIN12i","LIN12m",   {"weight":1}),
+                 ("LIN12i","LIN12i",   {"weight":1}),
+                 ("LIN3","MPK1",   {"weight":1}),
+                 ("MPK1","MPK1",  {"weight":1}),
+                 ("MPK1","LIN39",  {"weight":1}),
+                 ("MPK1","LIN12m",   {"weight":1}),
+                 ("MPK1","CKI1",   {"weight":1}),
+                 ("LIN39","LIN39",  {"weight":1}),
+                 ("LIN39","LIN12m",   {"weight":1}),
+                 ("LIN39","SCF",  {"weight":1}),
+	     	 ("LIN12m","LIN12i",  {"weight":1}),
+                 ("LIN3","LIN12i", {"weight":1}),
+	     	 ("LIN3","LIN3",  {"weight":1}),
+                 ("LS","LS", {"weight":1}),
+                 ("CDK4", "LIN12m",  {"weight":1}),
+                 ("CDK4","CKI1",   {"weight":1}),
+                 ("CDK4","LIN35",   {"weight":1}),
+                 ("CDK4","CDK1",   {"weight":1}),
+                 ("CDK1","LIN12i",   {"weight":1}),
+                 ("CDK1","CKI1",  {"weight":1}),
+                 ("CDK1","APC",  {"weight":1}),
+                 ("CDK1","CDK4",   {"weight":1}),
+                 ("CDK1","CDK1",   {"weight":1}),
+                 ("CKI1","CDK4",  {"weight":1}),
+                 ("CKI1","CDK2",   {"weight":1}),
+                 ("CKI1","CDK1",  {"weight":1}),
+	     	 ("LIN35","EFL1",  {"weight":1}),
+                 ("LIN35","CDK2", {"weight":1}),
+	     	 ("CDK2","LIN12i",  {"weight":1}),
+                 ("CDK2","LIN35", {"weight":1}),
+                 ("CDK2", "SCF",  {"weight":1}),
+                 ("EFL1","CDK2",   {"weight":1}),
+                 ("EFL1","CDK1",   {"weight":1}),
+                 ("CDK4","CDK1",   {"weight":1}),
+                 ("CDK1","LIN12i",   {"weight":1}),
+                 ("CDK1","CKI1",  {"weight":1}),
+                 ("CDK1","APC",  {"weight":1}),
+                 ("CDK1","CDK4",   {"weight":1}),
+                 ("CDK1","CDK1",   {"weight":1}),
+                 ("CKI1","CDK4",  {"weight":1}),
+                 ("CKI1","CDK2",   {"weight":1}),
+                 ("CKI1","CDK1",  {"weight":1}),
+	     	 ("SCF","APC",  {"weight":1}),
+                 ("SCF","CDK4", {"weight":1}),
+	     	 ("SCF","CDK2",  {"weight":1}),
+                 ("APC","CKI1", {"weight":1}),
+                 ("APC","SCF",  {"weight":1}),
+                 ("APC","CDK1", {"weight":1})
+            	]
+
+        X.add_edges_from(edges)
+
+        self.labelMap = {
+            "LIN3"  : 0,
+            "MPK1"  : 1,
+            "LIN39"  : 2,
+            "LS"  : 3,
+            "LIN12m"  : 4,
+            "LIN12i" : 5,
+            "CKI1"  : 6,
+            "EFL1" : 7,
+            "LIN35"  : 8,
+            "SCF" : 9,
+            "APC" : 10,
+            "CDK4"  : 11,
+            "CDK2" : 12,
+            "CDK1" : 13
+        }
+
+        i = self.labelMap
+
+
+        self.iMap[ i["LIN3"] ]  = [ i["LIN3"] ]
+        self.iMap[ i["MPK1"] ]  = [ i["LIN3"], i["MPK1"], i["LIN12i"] ]
+        self.iMap[ i["LIN39"] ]  = [ i["MPK1"], i["LIN39"]]
+        self.iMap[ i["LS"] ]  = [ i["LS"] ]
+        self.iMap[ i["LIN12m"] ]  = [ i["LIN39"], i["LIN12i"], i["MPK1"], i["CDK4"] ]
+        self.iMap[ i["LIN12i"] ]  = [ i["LS"], i["LIN12m"], i["LIN12i"], i["LIN3"], i["CDK2"], i["CDK1"]]
+        self.iMap[ i["CKI1"] ] = [ i["MPK1"], i["CDK4"], i["APC"], i["CDK1"] ]
+        self.iMap[ i["EFL1"] ]  = [ i["LIN35"]]
+        self.iMap[ i["LIN35"] ] = [ i["CDK4"], i["CDK2"] ]
+        self.iMap[ i["SCF"] ]  = [ i["LIN39"], i["APC"], i["CDK2"] ]
+        self.iMap[ i["APC"] ] = [ i["SCF"], i["CDK1"] ]
+        self.iMap[ i["CDK4"] ] = [ i["CKI1"], i["SCF"], i["CDK1"] ]
+        self.iMap[ i["CDK2"] ] = [ i["EFL1"], i["LIN35"], i["CKI1"], i["SCF"] ]
+        self.iMap[ i["CDK1"] ] = [ i["CKI1"], i["APC"], i["EFL1"], i["CDK4"], i["CDK1"] ]
+
+
+        return nx.DiGraph(nx.relabel_nodes(X, self.labelMap))
+
+    def LIN3(self, g, s, indexList, i) :
+        i = indexList
+        image =  s[ i[0] ].x
+        return state.State(int(image), 4)
+
+    def MPK1(self, g, s, indexList, i) :
+        i = indexList # self.iMap[ self.labelMap["M"] ]
+        #image =  s[ i[0] ].x and (not s[ i[1] ].x) and (not s[ i[2] ].x)
+        if(((s[i[0]].x == 3) and (s[i[1]].x >0)) or ((s[i[0]].x ==2)and (s[i[2]].x == 0) and (s[i[1]].x >0) ) ):
+            image = 2
+        elif((s[i[1]].x < 2)and (((s[i[0]].x ==1)and (s[i[2]].x == 1)) or (s[i[0]].x ==0))):
+            image = 0
+        else:
+            image = 1
+        #i = se lf.labelMap
+        #image =  s[ i["C"] ].x and (not s[ i["R"] ].x) and (not s[ i["Rm"] ].x)
+        return state.State(int(image), 3)
+
+    def LIN39(self, g, s, indexList, i) :
+        i = indexList
+        if((s[i[0]].x == 2) and (s[i[1]].x>0 )):
+            image = 2
+        #elif():
+        #    image = 0
+        else:
+            image = 1
+        return state.State(int(image), 3)
+
+    def LS(self, g, s, indexList, i) :
+        i = indexList
+        image =  s[ i[0] ].x
+        return state.State(int(image), 2)
+
+    def LIN12m(self, g, s, indexList, i) :
+        i = indexList
+        if(                  ((  s[i[0]].x > 0  )   or (    s[i[1]].x ==1       ))  and ( (s[i[2]].x <= 1) or (s[i[3]].x ==1)  )                                       ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def LIN12i(self, g, s, indexList, i) :
+        i = indexList
+        if( (( (s[i[0]].x == 1)    and (s[i[1]].x ==1) ) or  ((s[i[2]].x == 1) or (s[i[3]].x ==1))   ) and (  (s[i[4]].x == 1) or (s[i[5]].x == 0) ) ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def CKI1(self, g, s, indexList, i) :
+        i = indexList
+        if(                (s[i[0]].x == 0) and ( (s[i[1]].x == 0) and ((s[i[2]].x==1) or (s[i[3]].x==1) )     )                               ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def EFL1(self, g, s, indexList, i) :
+        i = indexList
+        if(s[i[0]].x == 0 ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def LIN35(self, g, s, indexList, i) :
+        i = indexList
+        if(    (s[i[0]].x == 0)   and (s[i[1]].x==0)            ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def SCF(self, g, s, indexList, i) :
+        i = indexList
+        if(             ((s[i[0]].x > 0) and (s[i[1]].x ==0)) and (s[i[2]].x == 1)                         ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def APC(self, g, s, indexList, i) :
+        i = indexList
+        if( (s[i[0]].x == 0) and (s[i[1]].x ==1) ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def CDK4(self, g, s, indexList, i) :
+        i = indexList
+        if(  (s[i[0]].x == 0) and (s[i[1]].x == 0) and ( s[i[2]].x==0) ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def CDK2(self, g, s, indexList, i) :
+        i = indexList
+        if( (s[i[0]].x == 1) and (s[i[1]].x == 0 ) and (s[i[2]].x == 0 ) and (s[i[3]].x == 0 ) ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def CDK1(self, g, s, indexList, i) :
+        i = indexList
+        if((s[i[0]].x == 0) and (s[i[1]].x == 0 ) and (s[i[2]].x == 1 ) and (  (s[i[3]].x == 0) or (s[i[4]].x == 1) )    ):
+            image = 1
+        else:
+            image = 0
+        return state.State(int(image), 2)
+
+    def SetFunctionList(self) :
+	    f = [self.LIN3, self.MPK1, self.LIN39, self.LS, self.LIN12m,
+             self.LIN12i, self.CKI1, self.EFL1, self.LIN35, self.SCF, self.APC, self.CDK4, self.CDK2, self.CDK1]
+	    return f
+
+    def GetGraph(self) :
+	    return self.X
+
+    def GetFunctionList(self) :
+	    return self.f
+
+    def GetIMap(self) :
+        return self.iMap
+
+    def GetBibtex(self) :
+	    return self.bibtex
+
+    def GetName(self) :
+	    return self.name
+
+    def GetDomain(self) :
+	    return self.domain
+
+
+
+    def ConstructGDS(self) :
+
+        n = nx.number_of_nodes(self.X)
+
+        #stateObject = n*[gds.state.State(0, 2)]
+        stateObject = []
+        stateObject = stateObject + [gds.state.State(0, 4)] + [gds.state.State(0, 3)] + [gds.state.State(0, 3)]+ (n-3)*[gds.state.State(0, 2)]
+
+        gds1 = gds.GDS(g = self.X, f = self.f,
+                       stateObjectList = stateObject,
+                       iMap = self.iMap)
+        return gds1
+
+
 def main() :
+    vpc = VPC()
+    g = vpc.GetGraph()
+    f = vpc.GetFunctionList()
+    n = nx.number_of_nodes(g)
+    m = nx.number_of_edges(g)
+
+    F = vpc.F
+    F.SetParallel()
+    #F.SetBlockSequence([ [0,1,2,3,4,6,8,9], [5,7] ])
+
+    p = phase_space.PhaseSpace(F)
+
+    periodicPoints = p.GetPeriodicPoints()
+
+    cNum = 0
+    for cycle in periodicPoints :
+        print "Cycle <%i>:" % cNum
+        for xIndex in cycle :
+            print "\t", F.tupleConverter.IndexToTuple( xIndex )
+        cNum += 1
+
+    sys.exit(0)
     lacOperon = LacOperon(1, 0, 0)
     X = lacOperon.GetGraph()
     activity = list()
