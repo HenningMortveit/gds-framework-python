@@ -159,6 +159,7 @@ class Activity :
             function = n * [self.func]
         
     	stateObject = n * [gds.state.State(0, 2)]
+        #SW(WARNNING): doCircle flag should set true if use eca rules
         self.gds = gds.GDS(self.sg, function, stateObject, False, self.sgIMap)
         pi = [self.close_sgn1]
         self.gds.SetBlockSequence(pi) #only evaluate nodes in closed d1 neighborhood
