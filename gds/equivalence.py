@@ -345,8 +345,24 @@ if __name__ == '__main__' :
 
     import graphs
     import groups
+    import biographs
 
-    q23 = graphs.HyperCube(dim = 3, base = 2)
+
+    vpc = biographs.VPC(2,0)
+    g = vpc.GetGraph()
+    n = g.selfloop_edges()
+    g.remove_edges_from(n)
+
+    alpha =  EnumAcyclicOrientations(g.to_undirected())
+    print "alpha", alpha
+
+    kappa = EnumKappaClasses(g.to_undirected())
+    print "kappa =", kappa
+
+    sys.exit(0)
+
+
+    q23 = graphs.HyperCube(dim = 2, base = 2)
     autq23 = groups.CreateAutQ2_3()
 
     kappa = EnumKappaClasses(q23)

@@ -101,7 +101,7 @@ class Activity :
         self.n1 = self.graph.neighbors(self.iNode) + self.graph.predecessors(self.iNode)
         self.n2 = list()
         for node in self.n1 :
-            neighbor = self.graph.neighbors(node) + self.graph.predecessors(node)
+            neighbor = self.graph.predecessors(node) #only predecessors needed for directed graph
             for n in neighbor :
                 if (not self.graph.has_edge(n, self.iNode) and n != self.iNode) :
                     self.n2.append(n)
@@ -150,16 +150,21 @@ class Activity :
                 for neighbor in self.iMap[node] :
                     sgNeighbors.append(self.labelMap[neighbor])
                 self.sgIMap[sgNode] = sgNeighbors
-       
+        stateObject = []
         if isinstance(self.func,list) : #non-uniform functions
             function = list()
             for i in range(n):
                 function.append(self.func[self.reverseLabelMap[i]]) #find the corresponding vertex function from the original function list
+                if(self.reverseLabelMap[i] == 0): #for VPC biograph: if subgraph contains ternary MPK-1 node
+                    stateObject = stateObject + [gds.state.State(0, 3)]
+                else:
+                    stateObject = stateObject + [gds.state.State(0, 2)]
         else:  #uniform founctions
             function = n * [self.func]
         
     	stateObject = n * [gds.state.State(0, 2)]
         #SW(WARNNING): doCircle flag should set true if use eca rules
+    	#stateObject = n * [gds.state.State(0, 2)] #this only works with strictly boolean networks
         self.gds = gds.GDS(self.sg, function, stateObject, False, self.sgIMap)
         pi = [self.close_sgn1]
         self.gds.SetBlockSequence(pi) #only evaluate nodes in closed d1 neighborhood
@@ -178,7 +183,7 @@ class Activity :
         	iFlipImageIndex = transitions[iFlipStateIndex]
         	if (y != iFlipImageIndex) :
             		self.diff = self.diff + 1
-    	self.activity = float(self.diff)/(2**self.gds.GetDim())
+    	self.activity = float(self.diff)/(self.gds.NumStates())
 
     def GetSubgraph (self) :
         return self.subgraph
