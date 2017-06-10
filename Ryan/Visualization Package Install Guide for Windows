@@ -1,0 +1,15 @@
+In Windows:
+Graphviz http://www.graphviz.org/
+    -install using .msi file
+
+In Python 2.7:
+Graphviz
+	-install via “pip install graphviz”
+PyGraphviz
+    -download .whl file at http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygraphviz
+    -install via pip install
+
+Try first ‘visualization_example’ in /Ryan/example.py. If receiving error: ValueError: Program neato not found in path,
+Use Windows start to search for “Edit the System Environment Variables” and add in the “C:\Program Files (x86)\Graphviz2.38\bin” address to the variable “Path” in both the User variables and System variables.
+
+

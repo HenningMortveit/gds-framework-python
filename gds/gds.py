@@ -127,5 +127,12 @@ class GDS :
         i = self.tupleConverter.TupleToIndex(indexState)
         return i
 
+    #output state as a string, e.g. '0010'
+    def StateToString(self, l):
+        outString = ""
+        for state in l:
+            outString += str(state)
+        return outString
+
 # -- End --
 
