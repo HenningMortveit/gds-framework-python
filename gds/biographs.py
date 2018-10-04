@@ -6,14 +6,12 @@
 ################################################################################
 
 import networkx as nx
-import matplotlib.pyplot as plt
 import gds
 import state
 import functions
 import sys
 import algorithms
 import phase_space
-
 import Activity
 
 class LacOperon() :
@@ -779,6 +777,18 @@ class VPC() :
 
 def main() :
 
+    lacOperon = LacOperon(1, 0, 0)
+    X = lacOperon.GetGraph()
+    activity = list()
+    f = lacOperon.GetFunctionList()
+    for node in X.nodes():
+        iMap = lacOperon.GetIMap()
+        A = Activity.Activity(X, f, node, iMap)
+        A.ComputeActivity()
+        activity.append(A.GetActivity())
+    print "activity:", activity
+    sys.exit(0)
+
     vpc = VPC(3,0)
     g = vpc.GetGraph()
 
@@ -815,17 +825,7 @@ def main() :
 
     sys.exit(0)
     '''
-    lacOperon = LacOperon(1, 0, 0)
-    X = lacOperon.GetGraph()
-    activity = list()
-    f = lacOperon.GetFunctionList()
-    for node in X.nodes():
-        iMap = lacOperon.GetIMap()
-        A = Activity.Activity(X, f, node, iMap)
-        A.ComputeActivity()
-        activity.append(A.GetActivity())
-    print "activity:", activity
-    sys.exit(0)  
+
 
     
 

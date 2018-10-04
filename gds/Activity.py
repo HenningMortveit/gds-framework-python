@@ -35,7 +35,6 @@ import algorithms
 import graphs
 import networkx
 import equivalence
-import matplotlib.pyplot as plt
 from biographs import *
 
 class Activity :

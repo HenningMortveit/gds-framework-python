@@ -213,7 +213,7 @@ class Orientation :
 
 
     def LinearExtension(self) :
-        return nx.algorithms.topological_sort( self.digraph )
+        return list(nx.algorithms.topological_sort( self.digraph ))
 
     def IsSource(self, v) :
         return self.digraph.in_degree(v) == 0
