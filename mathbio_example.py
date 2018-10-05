@@ -16,7 +16,7 @@ import gds.util.enumeration
 from collections import Counter
 
 def get_system_multiset(bio_system):
-    '''
+
     # Retrieve dependency graph G
     G = bio_system.GetGraph()
 
@@ -37,37 +37,49 @@ def get_system_multiset(bio_system):
     # get [Kappa Class representatives]
     Acyc_G_kappa_reps = gds.equivalence.KappaLinearExtensions(G, 0)  # Vertex 0 is maximal degree
 
-    print Acyc_G_kappa_reps
-    '''
-
     F = bio_system.F
 
+    fixedPoints = []
+
+    freq_multi_set = {}
+
+    for rep in Acyc_G_kappa_reps:
+
+        multi_set = []
+        F.SetSequence(rep)
+        p = gds.phase_space.PhaseSpace(F)
+        periodicPoints = p.GetPeriodicPoints()
+
+        cNum = 0
+        for cycle in periodicPoints:
+            multi_set.append(len(cycle))
+            ''' # display periodic points
+            print "Cycle <%i>:" % cNum
+            for xIndex in cycle:
+                print "\t", F.tupleConverter.IndexToTuple(xIndex)
+            '''
+            cNum += 1
+
+        if rep == Acyc_G_kappa_reps[-1]:
+            fixedPoints = p.GetFixedPoints() # Fixed Pts. invariant under sequential update
+            fixedPoints = [F.tupleConverter.IndexToTuple(i) for i in fixedPoints]
+
+        multi_set.sort()
+        multi_set_key = tuple(multi_set)
+        if multi_set_key in freq_multi_set:
+            freq_multi_set[multi_set_key] += 1
+        else:
+            freq_multi_set[multi_set_key] = 1
 
 
-    F.SetSequence([0, 4, 5, 7, 2, 6, 1, 9, 8, 3])
-    p = gds.phase_space.PhaseSpace(F)
-
-    periodicPoints = p.GetPeriodicPoints()
-
-    fixedPoints = p.GetFixedPoints() # Fixed Pts. invariant under sequential update
-    fixedPoints = [F.tupleConverter.IndexToTuple(i) for i in fixedPoints]
-
-    multi_set = []
-    cNum = 0
-    for cycle in periodicPoints:
-        print "Cycle <%i>:" % cNum
-        multi_set.append(len(cycle))
-        for xIndex in cycle:
-            print "\t", F.tupleConverter.IndexToTuple(xIndex)
-        cNum += 1
-    #print Counter(multi_set) == Counter([3,1,3,1])
-    print multi_set
-    print fixedPoints
+    print "cycle multiset frequencies: ", freq_multi_set
+    print "fixed points: ", fixedPoints
 
 def main():
     # system analysis
-    lacOperon = gds.biographs.LacOperon(Ge=0, Le=0, Lem=1)
+    print "Lac Operon Example"
 
+    lacOperon = gds.biographs.LacOperon(Ge=0, Le=0, Lem=1)
     get_system_multiset(lacOperon)
 
     sys.exit(0)
