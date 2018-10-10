@@ -13,7 +13,7 @@ import gds.gds
 import gds.algorithms
 import gds.equivalence
 import gds.util.enumeration
-from collections import Counter
+import itertools
 
 def get_system_multiset(bio_system):
 
@@ -25,17 +25,23 @@ def get_system_multiset(bio_system):
     G.remove_edges_from(n)
     G = G.to_undirected()
 
-    (Acyc_G, linExt) = gds.equivalence.AcyclicOrientations(G)
+    # (Acyc_G, linExt) = gds.equivalence.AcyclicOrientations(G)
+    # print "alpha(G) =", len(Acyc_G)  # No. of Acyclic orientations
 
-    print "alpha(G) =", len(Acyc_G)  # No. of Acyclic orientations
+    alpha_G = gds.equivalence.EnumAcyclicOrientations(G)
+    print "alpha(G) =", alpha_G
 
     # Get [Kappa Classes composed of Acyc_G]
     kappa_G = gds.equivalence.EnumKappaClasses(G)  # No. of Kappa classes
 
     print "kappa(G) =", kappa_G
 
+    # Find vertex with maximal degree
+    degrees = [val for (node, val) in G.degree()]
+    v_maximal = degrees.index(max(degrees))
+
     # get [Kappa Class representatives]
-    Acyc_G_kappa_reps = gds.equivalence.KappaLinearExtensions(G, 0)  # Vertex 0 is maximal degree
+    Acyc_G_kappa_reps = gds.equivalence.KappaLinearExtensions(G, v_maximal)
 
     F = bio_system.F
 
@@ -76,7 +82,7 @@ def get_system_multiset(bio_system):
     print "fixed points: ", fixedPoints
 
 def main():
-    # system analysis
+
     print "Lac Operon Example"
 
     lacOperon = gds.biographs.LacOperon(Ge=0, Le=0, Lem=1)
@@ -84,34 +90,23 @@ def main():
 
     sys.exit(0)
 
-    # Lac Operon graph measures
-    lacOperon = gds.biographs.LacOperon(Ge=1, Le=0, Lem=0)
-    G = lacOperon.GetGraph()
 
-    # Remove self-loops and replace directed edges with undirected edges
-    n = G.selfloop_edges()
-    G.remove_edges_from(n)
-    G = G.to_undirected()
+    print "C. Elegans Example"
 
+    VPC_network = gds.biographs.VPC(LIN3=0, LS=0)
+    get_system_multiset(VPC_network)
 
-    (Acyc_G, linExt) = gds.equivalence.AcyclicOrientations(G)
-
-    print "alpha(G) =", len(Acyc_G)  # No. of Acyclic orientations
-
-    # Get [Kappa Classes composed of Acyc_G]
-    kappa_G = gds.equivalence.EnumKappaClasses(G)  # No. of Kappa classes
-
-    print "kappa(G) =", kappa_G
-
-    # get [Kappa Class representatives]
-    Acyc_G_kappa_reps = gds.equivalence.KappaLinearExtensions(G, 0)  # Vertex 0 is maximal degree
-
-    print Acyc_G_kappa_reps
-
-
+    '''
+    # multisets over all parameters. Warning: this computation can take quite long. 
+    # Simple parallelization is recommended. 
+    LIN3_set = [0,1,2,3]
+    LS_set = [0,1]
+    for params in itertools.product(LIN3_set,LS_set):
+        VPC_network = gds.biographs.VPC(params[0], params[1])
+        get_system_multiset(VPC_network)
+    '''
 
     sys.exit(0)
-
 
 
 
