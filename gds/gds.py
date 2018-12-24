@@ -38,8 +38,9 @@ class GDS :
                 self.iMap[self.dim-1] = [self.dim-2, self.dim-1, 0]
 
         else :
-            #construct the graph g using the iMaps.            
-            print "GDS: iMap supplied"
+            #construct the graph g using the iMaps.
+            0
+            #print "GDS: iMap supplied"
 
         self.SetStateObjectList(stateObjectList)
 
@@ -135,4 +136,3 @@ class GDS :
         return outString
 
 # -- End --
-
